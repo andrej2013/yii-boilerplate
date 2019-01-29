@@ -1,7 +1,7 @@
 <?php
 
 
-namespace aki2013\yiiboilerplate;
+namespace andrej2013\yiiboilerplate;
 
 use yii\base\Module as BaseModule;
 use Yii;

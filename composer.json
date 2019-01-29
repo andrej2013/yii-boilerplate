@@ -1,5 +1,5 @@
 {
-  "name": "aki2013/yii-boilerplate",
+  "name": "andrej2013/yii-boilerplate",
   "description": "Yii2 Boilerplate",
   "keywords": [
     "boilerplate",
@@ -66,6 +66,6 @@
       "npm-asset-library": "vendor/npm",
       "bower-asset-library": "vendor/bower"
     },
-    "bootstrap": "aki2013\\yiiboilerplate\\Bootstrap"
+    "bootstrap": "andrej2013\\yiiboilerplate\\Bootstrap"
   }
 }
