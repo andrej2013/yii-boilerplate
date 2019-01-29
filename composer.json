@@ -57,8 +57,8 @@
   "autoload": {
     "classmap": ["src/traits/ArrayableTrait.php", "src/helpers/ArrayHelper.php"],
     "psr-4": {
-      "aki2013\\yiiboilerplate\\": "src/",
-      "aki2013\\yiiboilerplatetests\\": "tests/"
+      "andrej2013\\yiiboilerplate\\": "src/",
+      "andrej2013\\yiiboilerplatetests\\": "tests/"
     }
   },
   "extra": {
