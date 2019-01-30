@@ -50,7 +50,8 @@
     "quexer69/yii2-google-api": "2.0.*",
     "google/apiclient": "^2.0",
     "google/apiclient-services": "dev-master",
-    "lajax/yii2-translate-manager": "1.*"
+    "lajax/yii2-translate-manager": "1.*",
+    "dmstr/yii2-adminlte-asset": "^2.6"
   },
   "autoload": {
     "classmap": ["src/traits/ArrayableTrait.php", "src/helpers/ArrayHelper.php"],
