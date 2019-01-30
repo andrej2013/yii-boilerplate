@@ -18,7 +18,6 @@
     "fxp/composer-asset-plugin": "^1.4",
     "vlucas/phpdotenv": "^3.3",
     "taktwerk/tw-yii2-rest": "^1.0",
-    "taktwerk/tw-pages": "dev-master",
     "bupy7/yii2-activerecord-history": "*",
     "trntv/probe": "1.*",
     "bower-asset/jquery": "*",
