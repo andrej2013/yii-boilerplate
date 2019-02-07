@@ -267,6 +267,7 @@ foreach ($exportColumns as $column => $value) {
                     'id'            => '<?= Inflector::camel2id(StringHelper::basename($generator->modelClass), '-', true) ?>-grid'
                 ],
                 'columns'           => $slicedGridColumns,
+                'responsive'        => false,
                 'containerOptions'  => [
                     'style'         => 'overflow: auto'
                 ], // only set when $responsive = false
