@@ -40,7 +40,7 @@ class SecurityController extends BaseSecurityController
     /**
      * @var bool disable the layout for the views
      */
-    public $layout = '@andrej2013-backend-views/themes/adminlte/layouts/main-login';
+    public $layout = '@andrej2013-backend-views/layouts/main-login';
 
     /**
      * @var string login view

@@ -86,7 +86,7 @@ class RecoveryController extends \dektrium\user\controllers\RecoveryController
             return $this->render('/message', [
                 'title'  => \Yii::t('app', 'Invalid or expired link'),
                 'module' => $this->module,
-                'layout' => '@andrej2013-backend-views/themes/adminlte/layouts/main-login',
+                'layout' => '@andrej2013-backend-views/layouts/main-login',
             ]);
         }
 

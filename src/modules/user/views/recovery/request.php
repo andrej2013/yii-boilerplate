@@ -17,7 +17,7 @@ use yii\widgets\ActiveForm;
  * @var yii\widgets\ActiveForm            $form
  * @var dektrium\user\models\RecoveryForm $model
  */
-$this->context->layout = '@andrej2013-backend-views/themes/adminlte/layouts/main-login';
+$this->context->layout = '@andrej2013-backend-views/layouts/main-login';
 $this->title = Yii::t('app', 'Recover your password');
 $this->params['breadcrumbs'][] = $this->title;
 ?>

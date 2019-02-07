@@ -6,7 +6,7 @@ use yii\widgets\ActiveForm;
 /* @var $this \yii\web\View */
 /* @var $content string */
 $this->title = $this->title . ' [' . Yii::t('app', 'Sign up') . ']';
-//$this->context->layout = '@andrej2013-backend-views/themes/adminlte/layouts/main-login';
+//$this->context->layout = '@andrej2013-backend-views/layouts/main-login';
 ?>
 
 <div class="login-box">

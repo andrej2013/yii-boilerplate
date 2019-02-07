@@ -590,7 +590,7 @@ class Bootstrap implements BootstrapInterface
     {
         $this->registerModule('backend', [
             'class'  => 'andrej2013\yiiboilerplate\modules\backend\Module',
-            'layout' => Yii::$app->layout != 'main' ? Yii::$app->layout : '@andrej2013-backend-views/themes/adminlte/layouts/main',
+            'layout' => Yii::$app->layout != 'main' ? Yii::$app->layout : '@andrej2013-backend-views/layouts/main',
         ]);
 
         $this->registerModule('datecontrol', [

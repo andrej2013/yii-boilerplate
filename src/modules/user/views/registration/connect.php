@@ -7,7 +7,7 @@ use yii\widgets\ActiveForm;
 /* @var $content string */
 $this->title = $this->title . ' [' . Yii::t('app', 'Login') . ']';
 
-$this->context->layout = '@andrej2013-backend-views/themes/adminlte/layouts/main-login';
+$this->context->layout = '@andrej2013-backend-views/layouts/main-login';
 ?>
 <div class="login-box">
     <div class="login-logo logo-image">

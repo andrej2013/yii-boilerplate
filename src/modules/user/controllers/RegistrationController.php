@@ -15,6 +15,6 @@ namespace andrej2013\yiiboilerplate\modules\user\controllers;
 
 class RegistrationController extends \dektrium\user\controllers\RegistrationController
 {
-    public $layout = '@andrej2013-backend-views/themes/adminlte/layouts/main-login';
+    public $layout = '@andrej2013-backend-views/layouts/main-login';
 
 }
