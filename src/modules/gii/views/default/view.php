@@ -1,0 +1,95 @@
+<?php
+
+use yii\helpers\Html;
+use yii\widgets\ActiveForm;
+use yii\gii\components\ActiveField;
+use yii\gii\CodeFile;
+
+/* @var $this yii\web\View */
+/* @var $generator yii\gii\Generator */
+/* @var $id string panel ID */
+/* @var $form yii\widgets\ActiveForm */
+/* @var $results string */
+/* @var $hasError bool */
+/* @var $files CodeFile[] */
+/* @var $answers array */
+
+$this->title = $generator->getName();
+$templates = [];
+foreach ($generator->templates as $name => $path) {
+    $templates[$name] = "$name ($path)";
+}
+\yii\gii\GiiAsset::register($this);
+?>
+<div class="box box-solid">
+    <div class="box-header with-border">
+        <h1><?= Html::encode($this->title) ?>
+        </h1>
+    </div>
+    <div class="box-body default-view">
+        <p class="lead"><?= $generator->getDescription() ?></p>
+
+        <?php $form = ActiveForm::begin([
+            'id'              => "$id-generator",
+            'successCssClass' => '',
+            'fieldConfig'     => ['class' => ActiveField::className()],
+        ]); ?>
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <div class="col-lg-8 col-md-10" id="form-fields">
+                    <?= $this->renderFile($generator->formView(), [
+                        'generator' => $generator,
+                        'form'      => $form,
+                    ]) ?>
+                    <?= $form->field($generator, 'template')
+                             ->sticky()
+                             ->label('Code Template')
+                             ->dropDownList($templates)
+                             ->hint('
+                        Please select which set of the templates should be used to generated the code.
+                ') ?>
+                    <div class="form-group">
+                        <?= Html::submitButton('Preview', ['name' => 'preview', 'class' => 'btn btn-primary btn-flat']) ?>
+
+                        <?php if (isset($files)): ?>
+                            <?= Html::submitButton('Generate', ['name' => 'generate', 'class' => 'btn btn-success btn-flat']) ?>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <?php
+        if ($generator->errors) {
+            ?>
+            <div class="panel panel-danger">
+                <div class="panel-heading">Fix following errors</div>
+                <div class="panel-body">
+                    <ul>
+                        <?php
+                        echo $form->errorSummary($generator);
+                        ?>
+                    </ul>
+                </div>
+            </div>
+            <?php
+        }
+        ?>
+        <?php
+        if (isset($results)) {
+            echo $this->render('view/results', [
+                'generator' => $generator,
+                'results'   => $results,
+                'hasError'  => $hasError,
+            ]);
+        } else if (isset($files)) {
+            echo $this->render('view/files', [
+                'id'        => $id,
+                'generator' => $generator,
+                'files'     => $files,
+                'answers'   => $answers,
+            ]);
+        }
+        ?>
+        <?php ActiveForm::end(); ?>
+    </div>
+</div>

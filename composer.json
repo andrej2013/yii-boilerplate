@@ -51,7 +51,13 @@
     "google/apiclient": "^2.0",
     "google/apiclient-services": "dev-master",
     "lajax/yii2-translate-manager": "1.*",
-    "dmstr/yii2-adminlte-asset": "^2.6"
+    "dmstr/yii2-adminlte-asset": "^2.6",
+    "mihaildev/yii2-elfinder": "*",
+    "bower-asset/flag-icon-css": "*",
+    "bookin/yii2-awesome-bootstrap-checkbox": "@dev",
+    "kartik-v/yii2-widget-typeahead": "dev-master",
+    "kartik-v/yii2-widget-switchinput": "dev-master",
+    "fortawesome/font-awesome": "*"
   },
   "autoload": {
     "classmap": ["src/traits/ArrayableTrait.php", "src/helpers/ArrayHelper.php"],

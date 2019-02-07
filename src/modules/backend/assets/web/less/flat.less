@@ -1,0 +1,21 @@
+[class^='select2'] {
+  border-radius: 0px !important;
+}
+// Awesome checkbox override
+.checkbox {
+  padding-left: 20px;
+
+  label {
+    &::before {
+      border-radius: 0px;
+    }
+  }
+
+  input[type="checkbox"],
+  input[type="radio"] {
+    &:indeterminate + label::after {
+      border-radius: 0px;
+    }
+  }
+
+}
