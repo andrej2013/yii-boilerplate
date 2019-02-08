@@ -146,15 +146,6 @@ class UserTwData extends ActiveRecord
     }
 
     /**
-     * @param $string
-     * @return $this
-     */
-    public static function fetchCustomImportLookup($string)
-    {
-        return self::find()->andWhere([self::tableName() . '.deleted_at' => $string]);
-    }
-
-    /**
      * User for filtering results for Select2 element
      * @param null $q
      * @return array
