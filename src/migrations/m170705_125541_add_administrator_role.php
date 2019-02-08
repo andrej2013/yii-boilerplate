@@ -12,8 +12,8 @@ class m170705_125541_add_administrator_role extends Migration
     public function up()
     {
         $auth = $this->getAuth();
-        $role = $auth->getRole('Administrator');
-        if ($role === null) {
+        $administrator = $auth->getRole('Administrator');
+        if ($administrator === null) {
             $administrator = $auth->createRole('Administrator');
             $administrator->description = 'Administrator User';
             $auth->add($administrator);
