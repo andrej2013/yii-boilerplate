@@ -18,19 +18,8 @@ class m170706_125541_add_administrator_role extends Migration
             $administrator->description = 'Administrator User';
             $auth->add($administrator);
 
-            $editor = $auth->getRole('Editor');
-            $auth->addChild($administrator, $editor);
-        }
-        $role = $auth->getRole('Viewer');
-        if ($role === null) {
-            $viewer = $auth->createRole('Viewer');
-            $viewer->description = 'Viewer User';
-            $auth->add($viewer);
-
-            $editor = $auth->getRole('Editor');
-            $public = $auth->getRole('Public');
-            $auth->addChild($viewer, $public);
-            $auth->addChild($editor, $viewer);
+            $authenticated = $auth->getRole('Authenticated');
+            $auth->addChild($administrator, $authenticated);
         }
     }
 

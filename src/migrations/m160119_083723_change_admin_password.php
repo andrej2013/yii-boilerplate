@@ -7,7 +7,7 @@ class m160119_083723_change_admin_password extends Migration
 {
     public function up()
     {
-        $password_hash = Yii::$app->security->generatePasswordHash('passepartout.0', '10');
+        $password_hash = Yii::$app->security->generatePasswordHash('admin', '10');
         $this->update('{{%user}}', ['password_hash' => $password_hash], ['username' => 'admin']);
     }
 

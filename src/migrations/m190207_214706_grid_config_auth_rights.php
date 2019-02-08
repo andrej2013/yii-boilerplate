@@ -8,8 +8,7 @@ class m190207_214706_grid_config_auth_rights extends Migration
     public function up()
     {
         $auth = $this->getAuth();
-        $authenticated = $auth->createRole('Authenticated');
-        $auth->add($authenticated);
+        $authenticated = $auth->getRole('Authenticated');
         $permission = $auth->createPermission('backend_grid-config');
         $auth->add($permission);
         $auth->addChild($authenticated, $permission);

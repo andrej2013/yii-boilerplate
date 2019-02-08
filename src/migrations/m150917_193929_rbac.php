@@ -13,9 +13,9 @@ class m150917_193929_rbac extends Migration
             $guest->description = 'Unauthenticated User';
             $auth->add($guest);
 
-            $editor = $auth->createRole('Editor');
-            $editor->description = 'prototype editor';
-            $auth->add($editor);
+            $authenticated = $auth->createRole('Authenticated');
+            $authenticated->description = 'Authenticated User';
+            $auth->add($authenticated);
 
             $permission = $auth->createPermission('backend_default');
             $permission->description = 'Backend Dashboard';
@@ -25,10 +25,9 @@ class m150917_193929_rbac extends Migration
             $permission->description = 'Main Site Controller';
             $auth->add($permission);
 
-            $auth->addChild($editor, $auth->getPermission('backend_default'));
-            $auth->addChild($editor, $auth->getPermission('app_site'));
+            $auth->addChild($authenticated, $auth->getPermission('backend_default'));
+            $auth->addChild($authenticated, $auth->getPermission('app_site'));
 
-            $auth->addChild($editor, $auth->getPermission('pages'));
         } else {
             throw new \yii\base\Exception('Application authManager must be an instance of \yii\rbac\DbManager');
         }
@@ -41,7 +40,7 @@ class m150917_193929_rbac extends Migration
         if ($auth instanceof \yii\rbac\DbManager) {
             $auth->remove($auth->getPermission('backend_default'));
             $auth->remove($auth->getPermission('app_site'));
-            $auth->remove($auth->getRole('Editor'));
+            $auth->remove($auth->getRole('Authenticated'));
             $auth->remove($auth->getRole('Public'));
         } else {
             throw new \yii\base\Exception('Application authManager must be an instance of \yii\rbac\DbManager');

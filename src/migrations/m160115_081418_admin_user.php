@@ -3,7 +3,7 @@
 use yii\db\Schema;
 use yii\db\Migration;
 
-class m160115_081418_admin_user_tw extends Migration
+class m160115_081418_admin_user extends Migration
 {
     public function up()
     {
@@ -14,7 +14,7 @@ class m160115_081418_admin_user_tw extends Migration
 
     public function down()
     {
-        echo "m160115_081418_admin_user_tw cannot be reverted.\n";
+        echo "m160115_081418_admin_user cannot be reverted.\n";
 
         return false;
     }
