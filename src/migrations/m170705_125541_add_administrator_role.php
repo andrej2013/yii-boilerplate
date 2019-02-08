@@ -7,7 +7,7 @@
 use yii\db\Schema;
 use andrej2013\yiiboilerplate\Migration;
 
-class m170706_125541_add_administrator_role extends Migration
+class m170705_125541_add_administrator_role extends Migration
 {
     public function up()
     {
@@ -17,10 +17,9 @@ class m170706_125541_add_administrator_role extends Migration
             $administrator = $auth->createRole('Administrator');
             $administrator->description = 'Administrator User';
             $auth->add($administrator);
-
-            $authenticated = $auth->getRole('Authenticated');
-            $auth->addChild($administrator, $authenticated);
         }
+        $authenticated = $auth->getRole('Authenticated');
+        $auth->addChild($administrator, $authenticated);
     }
 
     public function down()
