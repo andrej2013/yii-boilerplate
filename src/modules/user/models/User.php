@@ -35,7 +35,7 @@ class User extends \dektrium\user\models\User
     /**
      * @var \app\models\User
      */
-    private $_instance;
+    private static $_instance;
     
     /**
      * User's toString method. Can be overridden.
@@ -216,12 +216,12 @@ class User extends \dektrium\user\models\User
     /**
      * @return \app\models\User
      */
-    public function getInstance()
+    public static function getInstance()
     {
-        if ($this->_instance === null) {
-            $this->_instance = \Yii::$app->user->identity;
+        if (self::$_instance === null) {
+            self::$_instance = \Yii::$app->user->identity;
         }
-        return $this->_instance;
+        return self::$_instance;
     }
     
     /**
