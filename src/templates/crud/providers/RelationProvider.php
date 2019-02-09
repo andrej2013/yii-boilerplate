@@ -415,7 +415,7 @@ GridView::widget([
                         '$relation_key' => \$model->$model_primary_key,
                     ],
                 ], ['class' => 'btn', 'preset' => Html::PRESET_PRIMARY]),
-                'after'   => false,
+                'after'   => '{pager}',
                 'footer'  => false,
             ],
             'export'       => false,

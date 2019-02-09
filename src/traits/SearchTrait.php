@@ -74,7 +74,7 @@ trait SearchTrait
                     break;
                 }
             }
-        } else if (strpos(strtolower($qryString), ' and ') !== false) {
+        } else if (strpos(strtolower($search_string), ' and ') !== false) {
             $delimiters = [
                 ' and ',
                 ' And ',
@@ -91,7 +91,7 @@ trait SearchTrait
                     break;
                 }
             }
-        } else if (strpos(strtolower($qryString), ' or ') !== false) {
+        } else if (strpos(strtolower($search_string), ' or ') !== false) {
             $delimiters = [
                 ' or ',
                 ' Or ',
@@ -226,7 +226,7 @@ trait SearchTrait
             $out_format = 'Y-m-d';
             $out_format .= $date_time ? ' H:i:s' : '';
             $input_format = $date_time ? Yii::$app->formatter->momentJsDateTimeFormat : Yii::$app->formatter->momentJsDateFormat;
-            $input_dates = explode(' TO ', $this->$attribute_copy);
+            $input_dates = explode(' TO ', $this->$attribute);
             $out_dates = [];
             foreach ($input_dates as $input_date) {
                 $convert = \DateTime::createFromFormat(Helper::convertMomentToPHPFormat($input_format), trim($input_date));

@@ -507,7 +507,7 @@ HTML;
                 $min = $column->unsigned ? "'min' => '0'," : '';
                 $options += [
                     'placeholder' => "\$model->getAttributePlaceholder('$attribute')",
-                    'type'        => 'number',
+                    'type'        => "'number'",
                     'step'        => $column->phpType === 'double' ? "'any'" : 1,
                     'min'         => $column->unsigned ? 0 : "''",
                 ];

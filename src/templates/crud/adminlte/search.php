@@ -27,6 +27,7 @@ namespace <?= StringHelper::dirname(ltrim($generator->searchModelClass, '\\')) ?
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
+use andrej2013\yiiboilerplate\traits\SearchTrait;
 use <?= ltrim($generator->modelClass, '\\') . (isset($modelAlias) ? " as $modelAlias" : "") ?>;
 
 /**
@@ -35,6 +36,7 @@ use <?= ltrim($generator->modelClass, '\\') . (isset($modelAlias) ? " as $modelA
 class <?= $searchModelClass ?> extends <?= isset($modelAlias) ? $modelAlias : $modelClass ?>
 
 {
+    use SearchTrait;
     /**
      * @inheritdoc
      */
@@ -90,7 +92,7 @@ class <?= $searchModelClass ?> extends <?= isset($modelAlias) ? $modelAlias : $m
      */
     public function getPageSize()
     {
-        return $this->parsePageSize(<?= isset($modelAlias) ? $modelAlias : $modelClass ?>::className());
+        return $this->parsePageSize(<?= isset($modelAlias) ? $modelAlias : $modelClass ?>::class);
     }
 
 }
