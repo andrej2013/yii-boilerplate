@@ -64,7 +64,7 @@ class UrlManager extends BaseUrlManager
     
     public static function getFlag($language = null)
     {
-        $language = $language??Yii::$app->language;
+        $language = $language ? $language : Yii::$app->language;
         switch ($language) {
             case 'en':
                 $language = 'gb';
