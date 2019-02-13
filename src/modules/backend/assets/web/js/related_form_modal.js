@@ -5,7 +5,7 @@ $.fn.hasAttr = function (name) {
 (function ($) {
     
     // Register add and edit clicks
-    $('button.add_select, button.edit_select').on('click', function () {
+    $(document.body).on('click', 'button.add_select, button.edit_select', function () {
         var update   = $(this).hasAttr('data-update');
         var owner_id = $(this).closest('div.select2-bootstrap-append').find('select').attr('id');
         var url      = $(this).attr('data-url');
@@ -25,6 +25,7 @@ $.fn.hasAttr = function (name) {
         var temp           = this;
         var self           = this;
             loadForm       = function () {
+                console.log(self);
                 return new Promise(function (resolve, reject) {
                     var url = self.attr('data-url');
                     if (self.attr('data-update') == 'true') {
