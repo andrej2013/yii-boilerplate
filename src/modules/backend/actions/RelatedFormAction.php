@@ -93,40 +93,55 @@ class RelatedFormAction extends Action
         $model = $this->model;
         // Always use model primary key for fetching
         $pk = $model::primaryKey()[0];
-
-        if ($this->model->load($_POST) && $this->model->save()) {
-            if ($this->depend && $this->relation) {
-                $reflection = new \ReflectionClass($this->model);
-                $ns = $reflection->getNamespaceName();
-                $junkModel = $ns . '\\' . $this->relation;
-                $reflection = new \ReflectionClass($this->model);
-                $modelName = $reflection->getShortName();
-                $relationModel = new $junkModel();
-                $relationId = $this->relationId;
-                $relationModel->$relationId = $this->relationIdValue;
-                $foreignKey = strtolower($modelName) . '_id';
-                $relationModel->$foreignKey = $this->model->id;
-                $relationModel->save();
+        try {
+            if ($this->model->load($_POST)) {
+                Yii::$app->response->format = Response::FORMAT_JSON;
+                if ($this->model->save()) {
+                    if ($this->depend && $this->relation) {
+                        $reflection = new \ReflectionClass($this->model);
+                        $ns = $reflection->getNamespaceName();
+                        $junkModel = $ns . '\\' . $this->relation;
+                        $reflection = new \ReflectionClass($this->model);
+                        $modelName = $reflection->getShortName();
+                        $relationModel = new $junkModel();
+                        $relationId = $this->relationId;
+                        $relationModel->$relationId = $this->relationIdValue;
+                        $foreignKey = strtolower($modelName) . '_id';
+                        $relationModel->$foreignKey = $this->model->id;
+                        $relationModel->save();
+                    }
+                    return [
+                        'id'    => $this->model->$pk,
+                        'label' => $this->model->toString,
+        
+                    ];
+                } else {
+                    Yii::$app->response->statusCode = 500;
+                    return $this->display();
+                }
             }
+        } catch (\Exception $e) {
             Yii::$app->response->format = Response::FORMAT_JSON;
-            return [
-                'id'    => $this->model->$pk,
-                'label' => $this->model->toString,
-
-            ];
+            Yii::$app->response->statusCode = 500;
+            return $this->display();
         }
         if ($this->depend) {
             $this->model->{$this->relationId} = $this->relationIdValue;
             $options['depend'] = true;
         }
-        return $this->controller->renderAjax($this->viewFile, array_merge([
+        return $this->display();
+    }
+    
+    protected function display()
+    {
+        return $this->controller->renderAjax($this->viewFile, [
             'model'     => $this->model,
             // Using this to know that call in _form template come from related action ajax call
             'is_popup'  => true,
             // Sending this to _form to know from which select2 call come and based on that always build unique ID
             'caller_id' => Yii::$app->getRequest()
                                     ->get('caller_id'),
-        ], $options));
+        ]);
     }
 
 }

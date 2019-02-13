@@ -64,14 +64,15 @@ $.fn.hasAttr = function (name) {
 
                             }
                             $('.loader').addClass('hide');
-                            resolve('success');
+                            resolve(data);
                         })
-                        .fail(function () {
+                        .fail(function (data) {
                             $('.loader').addClass('hide');
-                            console.log("server error");
+                            reject(data.responseJSON);
                         });
                 })
             };
+
         $($(this).attr('href')).find('form').on('submit', function (e) {
             e.preventDefault();
         });
@@ -88,7 +89,10 @@ $.fn.hasAttr = function (name) {
             .on('beforeSubmit', 'form', function (e) {
                 submitForm($(this)).then(function (data) {
                     self.modal('hide');
+                }, function (data) {
+                    $(self).find('.modal-body').html(data);
                 });
+                
                 return false;
             })
             .on('hide.bs.modal', function () {

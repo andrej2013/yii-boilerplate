@@ -236,27 +236,23 @@ abstract class CrudController extends Controller
         $model = $this->beforeCreate($model);
 
         try {
+            // Save actual model
             if ($model->load($_POST) && $model->save()) {
-                // Save actual model
-                if ($model->load($_POST) && $model->save()) {
-                    // Handle uploaded files
-                    if (! empty($uploadFields = CrudHelper::getUploadFields($this->getModel()))) {
-                        foreach ($uploadFields as $uploadField) {
-                            $model->uploadFile($uploadField, $_FILES[$this->baseModel]['tmp_name'], $_FILES[$this->baseModel]['name']);
-                        }
+                // Handle uploaded files
+                if (! empty($uploadFields = CrudHelper::getUploadFields($this->getModel()))) {
+                    foreach ($uploadFields as $uploadField) {
+                        $model->uploadFile($uploadField, $_FILES[$this->baseModel]['tmp_name'], $_FILES[$this->baseModel]['name']);
                     }
+                }
 
-                    // Save translations
-                    \Yii::$app->session->setFlash('success', \Yii::t('app', 'Saved {model}', ['model' => $model->toString]));
-                    if (isset($_POST['submit-default'])) {
-                        return $this->redirect(['update', 'id' => $model->id]);
-                    } else if (isset($_POST['submit-new'])) {
-                        return $this->redirect(['create']);
-                    } else {
-                        return $this->redirect(['index']);
-                    }
-                } else if (! Yii::$app->request->isPost) {
-                    $model->load($_GET);
+                // Save translations
+                \Yii::$app->session->setFlash('success', \Yii::t('app', 'Saved {model}', ['model' => $model->toString]));
+                if (isset($_POST['submit-default'])) {
+                    return $this->redirect(['update', 'id' => $model->id]);
+                } else if (isset($_POST['submit-new'])) {
+                    return $this->redirect(['create']);
+                } else {
+                    return $this->redirect(['index']);
                 }
             } else if (! Yii::$app->request->isPost) {
                 $model->load($_GET);

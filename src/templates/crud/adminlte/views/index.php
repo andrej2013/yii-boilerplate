@@ -344,6 +344,7 @@ foreach ($exportColumns as $column => $value) {
                                            ->can(Yii::$app->controller->module->id . '_' . Yii::$app->controller->id . '_create') ? Html::a('<i class="fa fa-plus"></i> ' . Yii::t('app', 'New'), ['create'], [
                         'class' => 'btn',
                         'preset'    => Html::PRESET_PRIMARY,
+                        'data-pjax' => 0,
                     ]) : ''),
                     'after'         => '{pager}',
                     'footer'        => false

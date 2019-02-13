@@ -30,7 +30,13 @@ use dmstr\widgets\Alert;
     </section>
 
     <section class="content">
+        <?php
+        \yii\widgets\Pjax::begin(['id' => 'pjax_alert']);
+        ?>
         <?= Alert::widget() ?>
+        <?php
+        \yii\widgets\Pjax::end();
+        ?>
         <?= $content ?>
     </section>
 </div>

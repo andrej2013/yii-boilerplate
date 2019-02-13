@@ -228,5 +228,5 @@ $caller_id = $is_popup ? ('_from_' . $caller_id) : '';
         <?= "<?php " ?>} ?>
         <?= "<?php " ?>ActiveForm::end(); ?>
 </div>
-<?=$generator->twoColumnsForm ? \yii\helpers\Html::tag('div', null, ['class' => 'clearfix']) : ''?>
 <?= "<?php\n" ?>
+\yii\helpers\Html::tag('div', null, ['class' => 'clearfix']);
