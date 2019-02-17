@@ -174,7 +174,7 @@ trait UploadTrait
      * Get unique upload path
      * @return string
      */
-    protected function getUploadPath()
+    public function getUploadPath()
     {
         $reflect = new ReflectionClass($this);
         return $this->uploadPath . $reflect->getShortName() . '/' . $this->id . '/';
