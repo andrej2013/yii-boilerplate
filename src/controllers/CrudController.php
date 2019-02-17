@@ -95,6 +95,7 @@ abstract class CrudController extends Controller
      */
     protected $relatedTypeForm = RelatedForms::TYPE_MODAL;
 
+    public $customUploadFields = [];
     /**
      * @return \andrej2013\yiiboilerplate\models\ActiveRecord
      */
@@ -239,7 +240,9 @@ abstract class CrudController extends Controller
             // Save actual model
             if ($model->load($_POST) && $model->save()) {
                 // Handle uploaded files
-                if (! empty($uploadFields = CrudHelper::getUploadFields($this->getModel()))) {
+                $uploadFields = CrudHelper::getUploadFields($this->getModel());
+                $uploadFields = ArrayHelper::merge($uploadFields, $this->customUploadFields);
+                if (! empty($uploadFields)) {
                     foreach ($uploadFields as $uploadField) {
                         $model->uploadFile($uploadField, $_FILES[$this->baseModel]['tmp_name'], $_FILES[$this->baseModel]['name']);
                     }
@@ -294,7 +297,9 @@ abstract class CrudController extends Controller
         $langCheck = method_exists($model, 'getLanguages') ? $pass : true;
         if ($model->load($_POST) && $model->save()) {
             // Handle uploaded files
-            if (! empty($uploadFields = CrudHelper::getUploadFields($this->getModel()))) {
+            $uploadFields = CrudHelper::getUploadFields($this->getModel());
+            $uploadFields = ArrayHelper::merge($uploadFields, $this->customUploadFields);
+            if (! empty($uploadFields)) {
                 foreach ($uploadFields as $uploadField) {
                     $model->uploadFile($uploadField, $_FILES[$this->baseModel]['tmp_name'], $_FILES[$this->baseModel]['name']);
                 }
