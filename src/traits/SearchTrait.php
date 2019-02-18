@@ -235,7 +235,8 @@ trait SearchTrait
             $query->andFilterWhere([
                 'BETWEEN',
                 $field_name,
-                $out_dates,
+                $out_dates[0],
+                $out_dates[1],
             ]);
         }
     }
