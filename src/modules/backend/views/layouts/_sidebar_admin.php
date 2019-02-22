@@ -41,11 +41,6 @@ if (Yii::$app->user->identity && Yii::$app->user->can('Authority')) {
             'icon'  => 'fa fa-cube',
         ],
         [
-            'label' => Yii::t('app', 'System Information'),
-            'url'   => ['/backend/system-information'],
-            'icon'  => 'fa fa-cube',
-        ],
-        [
             'label' => Yii::t('app', 'Webshell'),
             'url'   => ['/webshell'],
             'icon'  => 'fa fa-cube',
@@ -66,6 +61,11 @@ if (Yii::$app->user->identity && Yii::$app->user->can('Authority')) {
         [
             'label' => Yii::t('app', 'History'),
             'url'   => ['/backend/history'],
+            'icon'  => 'fa fa-cube',
+        ],
+        [
+            'label' => Yii::t('app', 'User Authentication Log'),
+            'url'   => ['/backend/user-auth-log'],
             'icon'  => 'fa fa-cube',
         ],
         [

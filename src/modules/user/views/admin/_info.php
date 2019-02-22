@@ -16,7 +16,7 @@
 
 ?>
 
-<?php $this->beginContent('@andrej2013-boilerplate/modules/user/views/admin/update.php', ['app' => $user]) ?>
+<?php $this->beginContent('@andrej2013-boilerplate/modules/user/views/admin/update.php', ['user' => $user]) ?>
 
 <table class="table">
     <tr>

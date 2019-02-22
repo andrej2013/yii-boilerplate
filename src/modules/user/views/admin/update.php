@@ -46,11 +46,6 @@ $this->params['breadcrumbs'][] = $this->title;
                                     'visible' => Yii::$app->user->can('Authority'),
                                 ],
                                 [
-                                    'label'   => Yii::t('app', 'Data'),
-                                    'url'     => ['/user/admin/tw-data', 'id' => $user->id],
-                                    'visible' => Yii::$app->user->can('Authority'),
-                                ],
-                                [
                                     'label'   => Yii::t('app', 'Information'),
                                     'url'     => ['/user/admin/info', 'id' => $user->id],
                                     'visible' => Yii::$app->user->can('Authority'),

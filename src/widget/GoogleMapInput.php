@@ -67,7 +67,6 @@ class GoogleMapInput extends InputWidget
             $address = null;
         }
         $replace['{code}'] =
-            '<br>' .
             '<div style="display: flex;">' .
             '<div style="flex-grow: 1;">' .
             '<div class="form-group">' .
@@ -84,8 +83,6 @@ class GoogleMapInput extends InputWidget
             ]) .
             '</div>' .
             '</div>' .
-            '<br>' .
-            '<br>' .
             '<div class="form-group">' .
             '<label class="control-label col-lg-3" for="' . $this->options['id'] . '-lng' . '">' . \Yii::t('app', 'Latitude') . ':</label>' .
             '<div class="col-lg-9">' .
@@ -100,8 +97,6 @@ class GoogleMapInput extends InputWidget
             ]) .
             '</div>' .
             '</div>' .
-            '<br>' .
-            '<br>' .
             '<div class="form-group">' .
             '<label class="control-label col-lg-3" for="' . $this->options['id'] . '-lng' . '">' . \Yii::t('app', 'Address') . ':</label>' .
             '<div class="col-lg-9">' .

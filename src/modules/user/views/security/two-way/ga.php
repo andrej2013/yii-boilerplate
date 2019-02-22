@@ -22,9 +22,11 @@ $this->title = Yii::t('user', 'Sign in');
 
 $user_id = $model->user->id;
 $ga = new \andrej2013\yiiboilerplate\modules\user\models\twoway\lib\GoogleAuthenticator();
+echo Html::beginTag('div', ['class' => 'text-center']);
 echo Html::img($ga->getQRCodeGoogleUrl($model->user->email, $qr, getenv('APP_TITLE')), [
     'class' => 'qr-code-image',
 ]);
+echo Html::endTag('div');
 ?>
 <?php $form = ActiveForm::begin([
     'id' => 'login-form',

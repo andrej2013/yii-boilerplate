@@ -1,11 +1,6 @@
 <?php
 /**
- * Copyright (c) 2017.
- * @author Nikola Tesic (nikolatesic@gmail.com)
- */
-
-/**
- * /srv/www/nassi-v2/src/../runtime/giiant/550b5d6e91bda0f79d4dbde409c53f05
+ * /home/ntesic/www/yii2-my-starter-kit/src/../runtime/giiant/fccccf4deb34aed738291a9c38e87215
  *
  * @package default
  */
@@ -15,36 +10,34 @@ use yii\helpers\Html;
 
 /**
  *
- * @var yii\web\View                              $this
- * @var \andrej2013\yiiboilerplate\models\ArHistory $model
- * @var string                                    $relatedTypeForm
+ * @var yii\web\View $this
+ * @var app\models\ArHistory $model
+ * @var string $relatedTypeForm
  */
 $this->title = Yii::t('app', 'Create');
-$this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Ar History'), 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Ar Histories'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="box box-default">
+<div class="box box-<?php echo \Yii::$app->params['style']['primary_color']; ?>">
     <div
-        class="giiant-crud box-body address-create">
+        class="giiant-crud box-body ar-history-create">
 
         <div class="clearfix crud-navigation">
             <div class="pull-left">
                 <?php echo Html::a(
-                    Yii::t('app', 'Cancel'),
-                    \yii\helpers\Url::previous(),
-                    [
-                        'class' => 'btn btn-default'
-                    ]
-                ) ?>
+	'<span class="fa fa-ban"></span> '.Yii::t('app', 'Cancel'),
+	\yii\helpers\Url::previous(),
+	[
+		'class' => 'btn',
+		'preset' => Html::PRESET_DANGER,
+	]
+) ?>
             </div>
         </div>
 
         <?php echo $this->render('_form', [
-            'model' => $model,
-            'inlineForm' => $inlineForm,
-            'action' => $action,
-            'relatedTypeForm' => $relatedTypeForm,
-        ]); ?>
+		'model' => $model,
+	]); ?>
 
     </div>
 </div>

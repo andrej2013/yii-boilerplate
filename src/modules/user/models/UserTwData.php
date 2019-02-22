@@ -39,7 +39,7 @@ class UserTwData extends ActiveRecord
      */
     public static function tableName()
     {
-        return 'user_tw_data';
+        return 'user_data';
     }
 
     /**

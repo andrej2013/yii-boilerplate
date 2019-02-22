@@ -4,7 +4,6 @@ namespace andrej2013\yiiboilerplate;
 
 use app\models\User;
 use dektrium\rbac\RbacWebModule;
-use dektrium\user\Finder;
 use yii\base\BootstrapInterface;
 use yii\base\Application;
 use Yii;
@@ -59,7 +58,6 @@ class Bootstrap implements BootstrapInterface
         Yii::setAlias('@andrej2013-boilerplate', '@vendor/andrej2013/yii-boilerplate/src/');
         Yii::setAlias('@andrej2013-views', '@vendor/andrej2013/yii-boilerplate/src/views');
         Yii::setAlias('@andrej2013-backend-views', '@vendor/andrej2013/yii-boilerplate/src/modules/backend/views');
-        Yii::setAlias('@pages', '@app/modules/backend/views');
     }
 
     /**
@@ -108,7 +106,7 @@ class Bootstrap implements BootstrapInterface
     protected function setupWeb($app)
     {
         $app->get('request')->cookieValidationKey = getenv('APP_COOKIE_VALIDATION_KEY');
-        $app->get('user')->identityClass = 'app\models\User';
+        $app->get('user')->identityClass = User::class;
         $this->setupWebComponents($app);
         $this->setupWebModules($app);
         $this->setupElfinder($app);
@@ -125,9 +123,9 @@ class Bootstrap implements BootstrapInterface
             $this->registerConsoleModules($app);
             $app->controllerNamespace = 'app\commands';
             $app->controllerMap = array_merge([
-                'db'        => 'dmstr\console\controllers\MysqlController',
+                'db'        => \dmstr\console\controllers\MysqlController::class,
                 'migrate'   => [
-                    'class'        => 'dmstr\console\controllers\MigrateController',
+                    'class'        => \dmstr\console\controllers\MigrateController::class,
                     'templateFile' => '@andrej2013-boilerplate/views/migration.php',
                 ],
                 'translate' => '\lajax\translatemanager\commands\TranslatemanagerController',
@@ -141,8 +139,6 @@ class Bootstrap implements BootstrapInterface
      */
     protected function registerViews(Application $app)
     {
-        //        $app->assetManager->bundles['dmstr\web\AdminLteAsset']['skin'] = false; // skin loading not working with assets-prod generation
-
         // Override dektrium user views with ours
         if (! isset($app->view->theme->pathMap['@dektrium/user/views/admin'])) {
             $app->view->theme->pathMap['@dektrium/user/views/admin'] = '@andrej2013-backend-views/users/admin';
@@ -162,11 +158,19 @@ class Bootstrap implements BootstrapInterface
     {
         $app->params += [
             'adminEmail'        => getenv('APP_ADMIN_EMAIL'),
+            'adminSkin'         => 'skin-blue',
             'style'             => [
                 'flat'            => true,
                 'primary_color'   => \yii\helpers\Html::TYPE_PRIMARY,
                 'secondary_color' => \yii\helpers\Html::TYPE_SUCCESS,
                 'danger_color'    => \yii\helpers\Html::TYPE_DANGER,
+            ],
+            'yii.migrations'    => [
+                getenv('APP_MIGRATION_LOOKUP'),
+                '@yii/rbac/migrations',
+                '@dektrium/user/migrations',
+                '@vendor/lajax/yii2-translate-manager/migrations',
+                '@vendor/pheme/yii2-settings/migrations',
             ],
             // Presets for CkEditor
             'richTextSimple'    => [
@@ -234,94 +238,28 @@ class Bootstrap implements BootstrapInterface
     protected function configGiiant(Application $app)
     {
         if (YII_ENV == 'dev' || YII_ENV == 'test') {
-            $aceEditorField = function ($attribute, $model, $generator) {
-                return "\$form->field(\$model, '{$attribute}')->widget(\\trntv\\aceeditor\\AceEditor::className())";
-            };
-
-            $checkBoxField = function ($attribute, $model, $generator) {
-                return "\$form->field(\$model, '{$attribute}')->checkbox()";
-            };
-
-            $dateTimePickerField = function ($attribute, $generator) {
-                return "\$form->field(\$model, '{$attribute}')->widget(\\kartik\\datecontrol\\DateControl::classname(), [
-                'type' => \\kartik\\datecontrol\\DateControl::FORMAT_DATETIME,
-                'ajaxConversion' => true,
-                'options' => [
-                    'type' => \\kartik\\datetime\\DateTimePicker::TYPE_COMPONENT_APPEND,
-                    'pickerButton' => ['icon' => 'time'],
-                    'pluginOptions' => [
-                        'todayHighlight' => true,
-                        'autoclose' => true,
-                        'class' => 'form-control'
-                    ]
-                ],
-            ])";
-            };
-            $datePickerField = function ($attribute, $generator) {
-                return "\$form->field(\$model, '{$attribute}')->widget(\\kartik\\datecontrol\\DateControl::classname(), [
-                'type' => \\kartik\\datecontrol\\DateControl::FORMAT_DATE,
-                'options' => [
-                    'type' => \\kartik\\date\\DatePicker::TYPE_COMPONENT_APPEND,
-                    'pluginOptions' => [
-                        'todayHighlight' => true,
-                        'autoclose' => true,
-                        'class' => 'form-control'
-                    ]
-                ],
-            ])";
-            };
-            $timePickerField = function ($attribute, $generator) {
-                return "\$form->field(\$model, '{$attribute}')->widget(\\kartik\\datecontrol\\DateControl::classname(), [
-                'type' => \\kartik\\datecontrol\\DateControl::FORMAT_TIME,
-                'options' => [
-                    'pluginOptions' => [
-                        'todayHighlight' => true,
-                        'autoclose' => true,
-                        'class' => 'form-control',
-                        'showSeconds' => false,
-                    ]
-                ],
-            ])";
-            };
-            $colourPickerField = function ($attribute, $generator) {
-                return "\$form->field(\$model, '{$attribute}')->widget(\\kartik\\color\\ColorInput::classname(), [
-                'options' => [
-                    'pluginOptions' => [
-                        'autoclose' => true,
-                        'class' => 'form-control',
-                    ]
-                ],
-            ])";
-            };
 
             Yii::$container->set('andrej2013\yiiboilerplate\templates\crud\providers\CallbackProvider', [
-                'columnFormats'    => [
+                'columnFormats' => [
                     // hide system fields, but not ID in table
                     'created_at$|updated_at$|created_by$|updated_by$|deleted_at$|deleted_by$' => Callback::false(),
                     // hide all TEXT or TINYTEXT columns
                     '.*'                                                                      => Db::falseIfText(),
                 ],
-                'activeFields'     => [
+                'activeFields'  => [
                     // hide system fields in form
                     'id$'                                                                         => Db::falseIfAutoIncrement(),
                     'id$|created_at$|updated_at$|created_by$|updated_by$|deleted_at$|deleted_by$' => Callback::false(),
-                    //                        '_at$'                                                                        => $dateTimePickerField,
-                    //                        '_date$'                                                                      => $datePickerField,
-                    'is_'                                                                         => $checkBoxField,
-                    'has_'                                                                        => $checkBoxField,
-                    //                        '_time$'                                                                      => $timePickerField,
-                    '_colour$'                                                                    => $colourPickerField, // Europeans happy
-                    '_color$'                                                                     => $colourPickerField, // Americans happy
                 ],
-                'attributeFormats' => [
+                /*'attributeFormats' => [
                     // render HTML output
                     '_html$' => Html::attribute(),
-                ],
+                ],*/
             ]);
 
             $app->controllerMap = array_merge($app->controllerMap, [
                 'batch' => [
-                    'class'                    => 'schmunk42\giiant\commands\BatchController',
+                    'class'                    => \schmunk42\giiant\commands\BatchController::class,
                     'overwrite'                => true,
                     'singularEntities'         => false,
                     'modelNamespace'           => 'app\\models',
@@ -341,10 +279,6 @@ class Bootstrap implements BootstrapInterface
                         'andrej2013\\yiiboilerplate\\templates\\crud\\providers\\EditorProvider',
                         'andrej2013\\yiiboilerplate\\templates\\crud\\providers\\RelationProvider',
                     ],
-                    'tablePrefix'              => 'app_',
-                    /*'tables' => [
-                        'app_profile',
-                    ]*/
                 ],
             ]);
         }
@@ -367,31 +301,13 @@ class Bootstrap implements BootstrapInterface
                         ],
                     ],
                     'giiant-crud'  => [
-                        'class'     => 'andrej2013\yiiboilerplate\templates\crud\Generator',
+                        'class'           => 'andrej2013\yiiboilerplate\templates\crud\Generator',
                         'messageCategory' => 'app',
-                        'templates' => [
+                        'templates'       => [
                             'andrej2013' => '@andrej2013-boilerplate/templates/crud/default',
                             'adminlte'   => '@andrej2013-boilerplate/templates/crud/adminlte',
                         ],
                     ],
-                    /*'giiant-test'    => [
-                        'class'     => 'andrej2013\yiiboilerplate\templates\test\Generator',
-                        'templates' => [
-                            'andrej2013' => '@andrej2013-boilerplate/templates/test/default',
-                        ],
-                    ],
-                    'giiant-fixture' => [
-                        'class'     => 'andrej2013\yiiboilerplate\templates\test\FixtureGenerator',
-                        'templates' => [
-                            'andrej2013' => '@andrej2013-boilerplate/templates/test/default',
-                        ],
-                    ],
-                    'giiant-menu'    => [
-                        'class'     => 'andrej2013\yiiboilerplate\templates\menu\Generator',
-                        'templates' => [
-                            'andrej2013' => '@andrej2013-boilerplate/templates/menu/default',
-                        ],
-                    ],*/
                 ],
             ]);
         }
@@ -421,12 +337,12 @@ class Bootstrap implements BootstrapInterface
         $app->controllerMap += [
             // used for backend (logged users only)
             'elfinder-backend' => [
-                'class'            => 'mihaildev\elfinder\Controller',
+                'class'            => \mihaildev\elfinder\Controller::class,
                 'disabledCommands' => ['netmount'],
                 'access'           => ['?', '@'],
                 'roots'            => [
                     [
-                        'class'     => 'andrej2013\yiiboilerplate\components\elfinder\flysystem\Volume',
+                        'class'     => \andrej2013\yiiboilerplate\components\elfinder\flysystem\Volume::class,
                         'component' => 'fs',
                         'name'      => 'Storage',
                     ],
@@ -434,12 +350,12 @@ class Bootstrap implements BootstrapInterface
             ],
             // used for frontend
             'elfinder'         => [
-                'class'            => 'andrej2013\yiiboilerplate\controllers\ElFinderController',
+                'class'            => \andrej2013\yiiboilerplate\controllers\ElFinderController::class,
                 'disabledCommands' => ['netmount'],
                 'access'           => ['?', '@'],
                 'roots'            => [
                     [
-                        'class'     => 'andrej2013\yiiboilerplate\components\elfinder\flysystem\Volume',
+                        'class'     => \andrej2013\yiiboilerplate\components\elfinder\flysystem\Volume::class,
                         'component' => 'fs',
                         'name'      => 'Storage',
                         'options'   => [
@@ -447,7 +363,7 @@ class Bootstrap implements BootstrapInterface
                         ],
                     ],
                     [
-                        'class'     => 'andrej2013\yiiboilerplate\components\elfinder\flysystem\Volume',
+                        'class'     => \andrej2013\yiiboilerplate\components\elfinder\flysystem\Volume::class,
                         'component' => 'fs_deploy',
                         'name'      => 'Deploy Storage',
                         'options'   => [
@@ -458,12 +374,12 @@ class Bootstrap implements BootstrapInterface
             ],
             // used for Sharing
             'file'             => [
-                'class'            => 'andrej2013\yiiboilerplate\controllers\ElFinderShareController',
+                'class'            => \andrej2013\yiiboilerplate\controllers\ElFinderShareController::class,
                 'disabledCommands' => ['netmount'],
                 'access'           => ['?', '@'],
                 'roots'            => [
                     [
-                        'class'     => 'andrej2013\yiiboilerplate\components\elfinder\flysystem\Volume',
+                        'class'     => \andrej2013\yiiboilerplate\components\elfinder\flysystem\Volume::class,
                         'component' => 'fs_seafile',
                         'name'      => 'Storage',
                         'options'   => [
@@ -481,29 +397,22 @@ class Bootstrap implements BootstrapInterface
      */
     private function setupCommonComponents(Application $app)
     {
-        $this->registerComponent('formatter', [
-            'class'          => 'yii\i18n\Formatter',
-            'timeZone'       => 'Europe/Zurich',
-            'locale'         => 'de-DE',
-            'dateFormat'     => 'php:d.m.Y',
-            'datetimeFormat' => 'php:d.m.Y H:i:s',
-        ]);
         $this->registerComponent('authManager', [
-            'class' => 'dektrium\rbac\components\DbManager',
+            'class' => \dektrium\rbac\components\DbManager::class,
         ]);
         // Set the default file cache
         $this->registerComponent('cache', [
-            'class' => 'yii\caching\FileCache',
+            'class' => \yii\caching\FileCache::class,
         ]);
 
         // Set the filesystem cache. Needs to be DbCache on balanced environments.
         $this->registerComponent('fs_cache', [
-            'class' => 'yii\caching\FileCache',
+            'class' => \yii\caching\FileCache::class,
         ]);
 
         $this->registerComponent('db', [
-            'class'             => '\yii\db\Connection',
-            'dsn'               => getenv('DATABASE_DSN') . (YII_ENV === 'test' ? '-test' : ''),
+            'class'             => \yii\db\Connection::class,
+            'dsn'               => getenv('DATABASE_DSN'),
             'username'          => getenv('DATABASE_USER'),
             'password'          => getenv('DATABASE_PASSWORD'),
             'charset'           => 'utf8',
@@ -513,18 +422,18 @@ class Bootstrap implements BootstrapInterface
 
         // Note: enable db sessions, if multiple containers are running
         /*$this->registerComponent('session', [
-            'class' => 'yii\web\DbSession'
+            'class' => \yii\web\DbSession::class
         ]);*/
 
         $this->registerComponent('fs', [
-            'class' => 'creocoder\flysystem\LocalFilesystem',
+            'class' => \creocoder\flysystem\LocalFilesystem::class,
             'path'  => '@app/../storage',
         ]);
 
         $disabledFs = ! empty($app->params['disabled_fs']) && in_array('assetsprod', $app->params['disabled_fs']);
         if (! $disabledFs) {
             $this->registerComponent('fs_assetsprod', [
-                'class' => 'creocoder\flysystem\LocalFilesystem',
+                'class' => \creocoder\flysystem\LocalFilesystem::class,
                 'path'  => '@webroot/storage-public',
             ]);
         }
@@ -537,14 +446,14 @@ class Bootstrap implements BootstrapInterface
     private function setupCommonModules(Application $app)
     {
         $this->registerModule('logreader', [
-            'class' => 'andrej2013\yiiboilerplate\modules\logreader\Module',
+            'class' => \andrej2013\yiiboilerplate\modules\logreader\Module::class,
         ]);
         $this->registerModule('gridview', [
             'class' => \kartik\grid\Module::className(),
         ]);
 
         $this->registerModule('translatemanager', [
-            'class'               => 'lajax\translatemanager\Module',
+            'class'               => \lajax\translatemanager\Module::class,
             'root'                => '@app/views',
             // The root directory of the project scan.
             //'scanRootParentDirectory' => true, // Whether scan the defined `root` parent directory, or the folder itself.
@@ -580,6 +489,20 @@ class Bootstrap implements BootstrapInterface
         $this->registerModule('arhistory', [
             'class' => \bupy7\activerecord\history\Module::className(),
         ]);
+        $this->registerModule('attachments', [
+            'class'     => \andrej2013\yiiboilerplate\modules\attachments\Module::class,
+            'tempPath'  => '@root/runtime/documents_temp',
+            'storePath' => '@root/storage/uploads/documents',
+            'rules'     => [
+                'maxFiles'  => 9999,
+                // Allow to upload maximum 99 files, default to 3
+                'mimeTypes' => 'image/*, application/pdf, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document, application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, text/*',
+                // Allow file types
+                'maxSize'   => 1024 * 1024 * 10
+                // 1 MB
+            ],
+            'tableName' => '{{%attachments}}' // Optional, default to 'attach_file'
+        ]);
     }
 
     /**
@@ -589,12 +512,12 @@ class Bootstrap implements BootstrapInterface
     private function setupWebModules(Application $app)
     {
         $this->registerModule('backend', [
-            'class'  => 'andrej2013\yiiboilerplate\modules\backend\Module',
-            'layout' => Yii::$app->layout != 'main' ? Yii::$app->layout : '@andrej2013-backend-views/layouts/main',
+            'class'  => \andrej2013\yiiboilerplate\modules\backend\Module::class,
+            'layout' => '@andrej2013-backend-views/layouts/main',
         ]);
 
         $this->registerModule('datecontrol', [
-            'class'           => '\kartik\datecontrol\Module',
+            'class'           => \kartik\datecontrol\Module::class,
             'ajaxConversion'  => true,
             'displaySettings' => [
                 \kartik\datecontrol\Module::FORMAT_DATE     => Yii::$app->formatter->dateFormat,
@@ -612,24 +535,33 @@ class Bootstrap implements BootstrapInterface
 
         $this->registerModule('rbac', [
             'class'     => RbacWebModule::class,
-            'layout'    => Yii::$app->layout,
+            'layout'    => '@andrej2013-backend-views/layouts/main',
             'as access' => $app->getBehavior('access'),
         ]);
 
         $this->registerModule('adminer', [
-            'class' => 'andrej2013\yiiboilerplate\modules\adminer\Module',
+            'class' => \andrej2013\yiiboilerplate\modules\adminer\Module::class,
         ]);
 
         $this->registerModule('webshell', [
             'class'               => \samdark\webshell\Module::className(),
             'allowedIPs'          => ['*', '127.0.0.1', '192.168.50.1', '178.220.62.51'],
             'checkAccessCallback' => function (\yii\base\Action $action) {
-                return Yii::$app->user->identity->isAdmin;
+                return Yii::$app->user->can('Authority');
             },
             'controllerNamespace' => '\andrej2013\yiiboilerplate\modules\webshell\controllers',
             'defaultRoute'        => 'index',
             'viewPath'            => '@andrej2013-boilerplate/modules/webshell/view',
             'yiiScript'           => Yii::getAlias('@root') . '/yii',
+        ]);
+        $this->registerModule('deploy', [
+            'class'          => \app\modules\deploy\DeployModule::class,
+            'token'          => getenv('DEPLOY_SECRET_KEY') ?? '0e05da967238924eb92fd8b71bb7a199',
+            'enableComposer' => true,
+            'gitBin'         => getenv('GIT_PATH') ?? '/usr/bin/git',
+            'phpBin'         => getenv('PHP_PATH') ?? '/usr/bin/php',
+            'composerBin'    => getenv('COMPOSER_PATH') ?? '/usr/bin/composer',
+            'branch'         => getenv('GIT_BRANCH') ?? 'master',
         ]);
     }
 
@@ -709,28 +641,28 @@ class Bootstrap implements BootstrapInterface
         $clients = [];
         if (getenv('FACEBOOK_APP_ID') && getenv('FACEBOOK_SECRET_KEY')) {
             $clients['facebook'] = [
-                'class'        => 'dektrium\user\clients\Facebook',
+                'class'        => \dektrium\user\clients\Facebook::class,
                 'clientId'     => getenv('FACEBOOK_APP_ID'),
                 'clientSecret' => getenv('FACEBOOK_SECRET_KEY'),
             ];
         }
         if (getenv('TWITTER_CONSUMER_KEY') && getenv('TWITTER_CONSUMER_SECRET')) {
             $clients['twitter'] = [
-                'class'          => 'dektrium\user\clients\Twitter',
+                'class'          => \dektrium\user\clients\Twitter::class,
                 'consumerKey'    => getenv('TWITTER_CONSUMER_KEY'),
                 'consumerSecret' => getenv('TWITTER_CONSUMER_SECRET'),
             ];
         }
         if (getenv('GOOGLE_CLIENT_ID') && getenv('GOOGLE_CLIENT_SECRET')) {
             $clients['google'] = [
-                'class'        => 'dektrium\user\clients\Google',
+                'class'        => \dektrium\user\clients\Google::class,
                 'clientId'     => getenv('GOOGLE_CLIENT_ID'),
                 'clientSecret' => getenv('GOOGLE_CLIENT_SECRET'),
             ];
         }
         if (getenv('LINKEDIN_CLIENT_ID') && getenv('LINKEDIN_CLIENT_SECRET')) {
             $clients['linkedin'] = [
-                'class'        => 'dektrium\user\clients\LinkedIn',
+                'class'        => \dektrium\user\clients\LinkedIn::class,
                 'clientId'     => getenv('LINKEDIN_CLIENT_ID'),
                 'clientSecret' => getenv('LINKEDIN_CLIENT_SECRET'),
             ];
@@ -739,7 +671,7 @@ class Bootstrap implements BootstrapInterface
             $clients = ArrayHelper::merge($clients, Yii::$app->params['authClients']);
         }
         $options = [
-            'class'   => \yii\authclient\Collection::className(),
+            'class'   => \yii\authclient\Collection::class,
             'clients' => $clients,
         ];
         $this->registerComponent('authClientCollection', $options, true);

@@ -41,7 +41,7 @@ class GridView extends BaseGridView
         }
         $encoding = ArrayHelper::getValue($this->export, 'encoding', 'utf-8');
         $bom = ArrayHelper::getValue($this->export, 'bom', true);
-        $target = ArrayHelper::getValue($this->export, 'target', self::TARGET_POPUP);
+        $target = ArrayHelper::getValue($this->export, 'target', self::TARGET_BLANK);
 
         $formOptions = [
             'class' => 'kv-export-form',

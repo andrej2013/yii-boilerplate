@@ -33,7 +33,6 @@ use dmstr\bootstrap\Tabs;
 /**
  * @var yii\web\View $this
  * @var <?= ltrim($generator->modelClass, '\\') ?> $model
- * @var boolean $useModal
  */
 $copyParams = $model->attributes;
 
@@ -174,8 +173,16 @@ foreach ($safeAttributes as $attribute) {
                         'active'    => true,
                     ],
 EOS;
-
+        $allPivots = [];
         foreach ($generator->getModelRelations($generator->modelClass, ['has_many']) as $name => $relation) {
+            if ($relation->via !== null) {
+                $allPivots[] = Inflector::pluralize($generator->getModelByTableName($relation->via->from[0]));
+            }
+        }
+        foreach ($generator->getModelRelations($generator->modelClass, ['has_many']) as $name => $relation) {
+            if (in_array($name, $allPivots)) {
+                continue;
+            }
             // Replace name of pivot tables with numbers
             $end = substr($name, -2, 1);
             $last = substr($name, -1);
@@ -198,27 +205,27 @@ EOS;
 
             echo "\n" . "<?php \$this->beginBlock('$label'); ?>\n";
             $showAllRecords = false;
+            $attachButton = null;
             if ($relation->via !== null) {
                 $pivotName = Inflector::pluralize($generator->getModelByTableName($relation->via->from[0]));
                 $pivotRelation = $model->{'get' . $pivotName}();
                 $pivotPk = key($pivotRelation->link);
-                $addButton = str_repeat(' ', 12) .
-                    "<?= Html::a(
-                '<span class=\"fa fa-link\"></span> ' . " .
+                $attachButton = "Html::a('<span class=\"fa fa-link\"></span> ' . " .
                     $generator->generateString('Attach') .
-                    " . ' " .
-                    Inflector::singularize(Inflector::camel2words($label)) .
-                    "',\n" .
-                    str_repeat(' ', 16) .
+                    " . ' ' ." .
+                    $generator->generateString(Inflector::singularize(Inflector::camel2words($label))) .
+                    ",\n" .
                     "['" . $generator->createRelationRoute($pivotRelation, 'create') .
                     "', '" .
                     Inflector::singularize($pivotName) .
                     "' => ['" . key($pivotRelation->link) .
-                    "'=>\$model->{$model->primaryKey()[0]}]],
-                ['class'=>'btn btn-info btn-xs']
-            ) ?>\n";
-            } else {
-                $addButton = '';
+                    "'=>\$model->{$model->primaryKey()[0]}], 'hide' => '".key($pivotRelation->link)."'],
+                [
+                    'class'=>'btn',
+                    'preset' => Html::PRESET_PRIMARY,
+                    'data-pjax' => 0,
+                ]
+            )";
             }
 
             // relation list, add, create buttons
@@ -234,7 +241,7 @@ if ($relation->via !== null) {
     $gridRelation = $relation;
     $gridName = $name;
 }
-$output = $generator->relationGrid($gridName, $gridRelation, $showAllRecords);
+$output = $generator->relationGrid($gridName, $gridRelation, $showAllRecords, $attachButton);
     // render relation grid
 
         ?>
@@ -250,7 +257,7 @@ $output = $generator->relationGrid($gridName, $gridRelation, $showAllRecords);
                         'label' => '<small>' .
                             Yii::t('app', '$label') .
                             '&nbsp;<span class="badge badge-default">' .
-                            count(\$model->get{$name}()->asArray()->all()) .
+                            \$model->get{$name}()->count() .
                             '</span></small>',
                         'active' => false,
                     ],
@@ -268,6 +275,22 @@ EOS;
                         'visible' => Yii::\$app->user->can('Administrator'),
                     ],
 EOS;
+        $model = new $generator->modelClass;
+        if (in_array('fileBehavior', array_keys($model->behaviors()))) {
+            $items[] = <<<EOS
+                    [
+                        'content' => \\andrej2013\\yiiboilerplate\\widget\\Attachment::widget([
+                            'model' => \$model,
+                            'type'  => \\andrej2013\\yiiboilerplate\\widget\\Attachment::PREVIEW,
+                        ]),
+                        'label' => '<small>' .
+                            Yii::t('app', 'Attachments') .
+                            '</small>',
+                        'active' => false,
+                    ],
+EOS;
+
+        }
         $items = implode("\n", $items);
         ?>
         <div class="nav-tabs-custom">

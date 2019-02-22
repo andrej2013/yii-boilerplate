@@ -43,4 +43,41 @@ trait DependingTrait
         return $out;
     }
 
+    /**
+     * @param $relation
+     */
+    public function actionDepending($relation)
+    {
+        if (isset($_POST['depdrop_parents'])) {
+            $parents = $_POST['depdrop_parents'];
+            if ($parents != null) {
+                $id = $parents[0];
+                if ($id != null) {
+                    $out = $this->getDependingList($id, $relation);
+                    echo Json::encode(['output' => $out]);
+                    return;
+                }
+            }
+        }
+        echo Json::encode(['output' => '', 'selected' => '']);
+    }
+
+    /**
+     * @param $id
+     * @param $relation
+     * @return array
+     */
+    protected function getDependingList($id, $relation)
+    {
+        $model = $this->model;
+        $model = $model::findOne($id);
+        $out = [];
+        foreach ($model->$relation as $result) {
+            $out[] = [
+                'id' => $result->id,
+                'name' => $result->toString,
+            ];
+        }
+        return $out;
+    }
 }

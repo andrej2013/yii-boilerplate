@@ -84,6 +84,7 @@ class Module extends \dektrium\user\Module
             'login-username' => 'security/login-username',
             'login-selection' => 'security/login-selection',
             'verify' => 'security/verify',
+            'resend' => 'registration/resend',
         ]);
         $this->twoWay = ArrayHelper::merge($this->defaultTwoWay, $this->twoWay);
         $this->layout = \Yii::$app->layout;

@@ -83,6 +83,8 @@ class RelatedFormAction extends Action
 
     public $relatedType;
 
+    public $hide;
+
     /**
      *
      */
@@ -97,41 +99,25 @@ class RelatedFormAction extends Action
             if ($this->model->load($_POST)) {
                 Yii::$app->response->format = Response::FORMAT_JSON;
                 if ($this->model->save()) {
-                    if ($this->depend && $this->relation) {
-                        $reflection = new \ReflectionClass($this->model);
-                        $ns = $reflection->getNamespaceName();
-                        $junkModel = $ns . '\\' . $this->relation;
-                        $reflection = new \ReflectionClass($this->model);
-                        $modelName = $reflection->getShortName();
-                        $relationModel = new $junkModel();
-                        $relationId = $this->relationId;
-                        $relationModel->$relationId = $this->relationIdValue;
-                        $foreignKey = strtolower($modelName) . '_id';
-                        $relationModel->$foreignKey = $this->model->id;
-                        $relationModel->save();
-                    }
                     return [
                         'id'    => $this->model->$pk,
                         'label' => $this->model->toString,
-        
+
                     ];
                 } else {
                     Yii::$app->response->statusCode = 500;
                     return $this->display();
                 }
             }
+            $this->model->load($_GET);
         } catch (\Exception $e) {
             Yii::$app->response->format = Response::FORMAT_JSON;
             Yii::$app->response->statusCode = 500;
             return $this->display();
         }
-        if ($this->depend) {
-            $this->model->{$this->relationId} = $this->relationIdValue;
-            $options['depend'] = true;
-        }
         return $this->display();
     }
-    
+
     protected function display()
     {
         return $this->controller->renderAjax($this->viewFile, [
@@ -141,6 +127,7 @@ class RelatedFormAction extends Action
             // Sending this to _form to know from which select2 call come and based on that always build unique ID
             'caller_id' => Yii::$app->getRequest()
                                     ->get('caller_id'),
+            'hide'      => $this->hide,
         ]);
     }
 

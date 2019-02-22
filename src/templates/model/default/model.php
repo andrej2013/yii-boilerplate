@@ -32,10 +32,10 @@ namespace <?= $generator->ns ?>\base;
 use Yii;
 use \app\models\ActiveRecord;
 use yii\db\Query;
-<?php if ($generator->haveCommentType('qrcode')) { ?>
+<?php if ($generator->haveType(\andrej2013\yiiboilerplate\templates\crud\Generator::TYPE_QR_CODE)) { ?>
 use andrej2013\yiiboilerplate\traits\QrTrait;
 <?php } ?>
-<?php if ($generator->haveCommentType('googlemap')) { ?>
+<?php if ($generator->haveType(\andrej2013\yiiboilerplate\templates\crud\Generator::TYPE_GOOGLE_MAP)) { ?>
 use andrej2013\yiiboilerplate\traits\GoogleMapTrait;
 <?php } ?>
 <?php if ($fileUpload) { ?>
@@ -75,7 +75,9 @@ class <?= $className ?> extends ActiveRecord
     ?>
     protected $enum_labels = false;
 <?php } ?>
-
+<?php if ($generator->getTableComment()->attachment) { ?>
+    public $attachments;
+<?php } ?>
 <?php if ($fileUpload) { ?>
 
     /**
@@ -83,10 +85,10 @@ class <?= $className ?> extends ActiveRecord
      */
     use UploadTrait;
 <?php } ?>
-<?php if ($generator->haveCommentType('qrcode')) { ?>
+<?php if ($generator->haveType(\andrej2013\yiiboilerplate\templates\crud\Generator::TYPE_QR_CODE)) { ?>
     use QrTrait;
 <?php } ?>
-<?php if ($generator->haveCommentType('googlemap')) { ?>
+<?php if ($generator->haveType(\andrej2013\yiiboilerplate\templates\crud\Generator::TYPE_GOOGLE_MAP)) { ?>
     use GoogleMapTrait;
 <?php } ?>
 
@@ -127,6 +129,9 @@ class <?= $className ?> extends ActiveRecord
 <?php foreach ($placeholders as $name => $placeholder) { ?>
             <?= "'$name' => " . $generator->generateString($placeholder) . ",\n" ?>
 <?php } ?>
+<?php if ($generator->getTableComment()->attachment) { ?>
+            'attachments'   => <?= $generator->generateString('Attachments') ?>,
+<?php } ?>
         ];
     }
 
@@ -143,7 +148,7 @@ class <?= $className ?> extends ActiveRecord
         ];
     }
 
-<?php if ($generator->tableHasCompositePrimaryKey($tableSchema)) { ?>
+<?php if ($generator->checkJunctionTable($tableSchema)) { ?>
     /**
      * Behaviors
      */
@@ -155,6 +160,19 @@ class <?= $className ?> extends ActiveRecord
         return $behaviors;
     }
 
+<?php } ?>
+<?php if ($generator->getTableComment()->attachment) { ?>
+    /**
+     * Behaviors
+     */
+    public function behaviors()
+    {
+        $behaviors = parent::behaviors();
+        $behaviors['fileBehavior'] = [
+            'class' => \andrej2013\yiiboilerplate\behaviors\FileBehavior::class,
+        ];
+        return $behaviors;
+    }
 <?php } ?>
     /**
      * Auto generated method, that returns a human-readable name as string
@@ -251,4 +269,25 @@ class <?= $className ?> extends ActiveRecord
         }
         return $out;
     }
+
+    /**
+     * @param $q
+     * @return array
+     */
+    public static function selectSearch($q)
+    {
+        $out = [];
+        $data = static::find()
+                      ->select(['id', 'text' => '<?= $generator->toStringAttribute($tableSchema) ?>'])
+                      ->andWhere(['LIKE', '<?= $generator->toStringAttribute($tableSchema) ?>', $q])
+                      ->distinct()
+                      ->orderBy('id')
+                      ->asArray()
+                      ->all();
+        foreach ($data as $d) {
+            $out['results'][] = $d;
+        }
+        return $out;
+    }
+
 }

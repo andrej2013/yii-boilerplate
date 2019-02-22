@@ -7,9 +7,21 @@ class m160115_081418_admin_user extends Migration
 {
     public function up()
     {
-        $this->execute("INSERT INTO {{%user}} (`id`, `username`, `email`, `password_hash`, `auth_key`, `confirmed_at`, `unconfirmed_email`, `blocked_at`, `registration_ip`, `created_at`, `updated_at`, `flags`) VALUES
-(1, 'admin', 'info@dukisoft.com', '\$2y\$10\$aUcoJriuMdENOgK9jtwkYubOwcZsPnaKA81pqsS5/bD/H37SenTEe', '18ejHbm8lkBwuG50knS2IXWNzqQRN7G8', 1434121729, NULL, NULL, NULL, 1434121725, 1434121725, 0);
-");
+        $password_hash = Yii::$app->security->generatePasswordHash('admin', '10');
+        $this->insert('{{%user}}', [
+            'id'                => 1,
+            'username'          => 'admin',
+            'email'             => 'admin@admin.com',
+            'password_hash'     => $password_hash,
+            'auth_key'          => '18ejHbm8lkBwuG50knS2IXWNzqQRN7G8',
+            'confirmed_at'      => time(),
+            'unconfirmed_email' => null,
+            'blocked_at'        => null,
+            'registration_ip'   => null,
+            'created_at'        => time(),
+            'updated_at'        => time(),
+            'flags'             => 0,
+        ]);
     }
 
     public function down()

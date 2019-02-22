@@ -34,9 +34,7 @@ trait ArHistoryTrait
             ->where([
                 \andrej2013\yiiboilerplate\models\ArHistory::tableName() . '.table_name' => static::tableName()
             ]);
-        if (getenv('CRUD')) {
             $relation->orderBy('created_at DESC');
-        }
         return $relation;
     }
 }

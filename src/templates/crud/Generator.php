@@ -31,6 +31,28 @@ class Generator extends SchmunkGenerator
 {
     use ProviderTrait, ModelTrait;
 
+    const TYPE_SELECT2      = 0;
+    const TYPE_DEPEND       = 1;
+    const TYPE_UPLOAD       = 2;
+    const TYPE_INPUT        = 3;
+    const TYPE_GOOGLE_MAP   = 4;
+    const TYPE_QR_CODE      = 5;
+    const TYPE_CHECKBOX     = 6;
+    const TYPE_ENUM         = 7;
+    const TYPE_DATE         = 8;
+    const TYPE_HTML_EDITOR  = 9;
+    const TYPE_TIME         = 10;
+    const TYPE_COLOR_PICKER = 11;
+    const TYPE_DATETIME     = 12;
+    const TYPE_EMAIL        = 13;
+    const TYPE_PHONE        = 14;
+    const TYPE_URL          = 15;
+    const TYPE_NUMBER       = 16;
+    const TYPE_HIDDEN       = 17;
+    const TYPE_PASSWORD     = 18;
+    const TYPE_TEXT         = 19;
+
+
     public $template            = 'adminlte';
     public $enableI18N          = true;
     public $searchModelClass    = 'app\\models\\search\\';
@@ -90,9 +112,9 @@ class Generator extends SchmunkGenerator
      */
     public $gridMaxColumns = 8;
 
-    public $generateExportButton = true;
+    public $generateExportButton   = true;
     public $generateExtendedSearch = true;
-    public $generateGridConfig   = true;
+    public $generateGridConfig     = true;
 
     public $generateCopyButton        = true;
     public $generateViewActionButtons = true;
@@ -177,18 +199,7 @@ class Generator extends SchmunkGenerator
      */
     public function generateActiveField($attribute, $name = null, $hidden = false, $id = null, $translate = false, $indentMore = 0)
     {
-        $indentMore = str_repeat(' ', 4 * $indentMore);
         $tableSchema = $this->getTableSchema();
-
-        // What is this scenario? No tableschema the column isn't set? Feels like generating a login page of some sort.
-        if ($tableSchema === false || ! isset($tableSchema->columns[$attribute])) {
-            if (preg_match('/^(password|pass|passwd|passcode)$/i', $attribute)) {
-                return "\$form->field(\$model, '$attribute')->hint(\$model->getAttributeHint('$attribute')->passwordInput()";
-            } else {
-                return "\$form->field(\$model, '$attribute')->hint(\$model->getAttributeHint('$attribute'))";
-            }
-        }
-
         $model = "\$model";
         $selector = [
             'selectors' => [
@@ -202,7 +213,6 @@ class Generator extends SchmunkGenerator
         ];
         $column = $tableSchema->columns[$attribute];
         $comment = $this->extractComments($column);
-        $nameid = trim(rtrim(trim($name) . "\n" . str_repeat(' ', 28) . $id, ','));
         if ($hidden) {
             $options = $this->var_export54($options);
             $html = <<<HTML
@@ -213,348 +223,6 @@ HTML::activeHiddenInput(
 );
 HTML;
             return $html;
-        } else if ($column->phpType === 'boolean' || $column->dbType === 'tinyint(1)' || substr($column->name, 0, 3) == 'is_' || substr($column->name, 0, 4) == 'has_' || ($comment && $comment->inputtype === 'checkbox')) {
-            $html = <<<HTML
-\$form->field(
-    \$model,
-    '$attribute',
-    $selector
-    )
-    ->checkbox([
-        $options
-    ])
-    ->hint(\$model->getAttributeHint('$attribute'));
-HTML;
-
-        } else if (($column->type === 'text' && ($comment && $comment->inputtype === 'editor')) || (strpos($column->name, '_html') !== false)) {
-            $toolset = 'standard';
-            if ($comment && $comment->toolset) {
-                $toolset = $comment->toolset;
-            }
-            return "\$form->field(
-$indentMore                $model,
-$indentMore                '{$attribute}'$selector
-$indentMore            )
-$indentMore                     ->widget(
-$indentMore                         \\andrej2013\\yiiboilerplate\\widget\\CKEditor::class,
-$indentMore                         [
-$indentMore                             $nameid
-$indentMore                             'editorOptions' => \\mihaildev\\elfinder\\ElFinder::ckeditorOptions(
-$indentMore                                 'elfinder-backend',
-$indentMore                                 [
-$indentMore                                     'height' => 300,
-$indentMore                                     'preset' => '$toolset',
-$indentMore                                 ]
-$indentMore                             ),
-$indentMore                         ]
-$indentMore                     )
-$indentMore                    ->hint(" . $model . "->getAttributeHint('$attribute'))";
-        } else if (($column->type === 'string' && ($comment && strtolower($comment->inputtype) === 'qrcode'))) {
-            $options = $this->var_export54($options);
-            $html = <<<HTML
-\$form->field(
-    \$model,
-    '{$attribute}',
-    $selector
-    )
-     ->widget(\\andrej2013\\yiiboilerplate\\widget\\QrInput::class, $options
-     )
-    ->hint(\$model->getAttributeHint('$attribute'));
-HTML;
-            return $html;
-        } else if (($column->type === 'string' && ($comment && strtolower($comment->inputtype) === 'googlemap'))) {
-            $options = $this->var_export54($options);
-            $html = <<<HTML
-\$form->field(
-    \$model,
-    '{$attribute}',
-    $selector
-    )
-     ->widget(\\andrej2013\\yiiboilerplate\\widget\\GoogleMapInput::class, $options
-     )
-    ->hint(\$model->getAttributeHint('$attribute'));
-HTML;
-            return $html;
-            // HTML 5 input fields
-        } else if (strpos($column->name, 'email') !== false || ($comment && $comment->inputtype === 'email')) {
-            $options += [
-                'type'        => "'email'",
-                'placeholder' => "\$model->getAttributePlaceholder('$attribute')",
-            ];
-            $options = $this->var_export54($options);
-            $html = <<<HTML
-\$form->field(
-    \$model,
-    '{$attribute}',
-    $selector
-    )
-     ->textInput($options)
-    ->hint(\$model->getAttributeHint('$attribute'));
-HTML;
-            return $html;
-        } else if (strpos($column->name, 'telephone') !== false || strpos($column->name, '_tel') !== false || ($comment && $comment->inputtype === 'telephone') || strpos($column->name, 'phone') !== false || ($comment && $comment->inputtype === 'phone')) {
-            $options += [
-                'type'        => "'tel'",
-                'placeholder' => "\$model->getAttributePlaceholder('$attribute')",
-            ];
-            $options = $this->var_export54($options);
-            $html = <<<HTML
-\$form->field(
-    \$model,
-    '{$attribute}',
-    $selector
-    )
-     ->textInput($options)
-    ->hint(\$model->getAttributeHint('$attribute'));
-HTML;
-            return $html;
-        } else if (strpos($column->name, 'search') !== false || ($comment && $comment->inputtype === 'search')) {
-            $options += [
-                'type'        => "'search'",
-                'placeholder' => "\$model->getAttributePlaceholder('$attribute')",
-            ];
-            $options = $this->var_export54($options);
-            $html = <<<HTML
-\$form->field(
-    \$model,
-    '{$attribute}',
-    $selector
-    )
-     ->textInput($options)
-    ->hint(\$model->getAttributeHint('$attribute'));
-HTML;
-            return $html;
-        } else if (strpos($column->name, 'url') !== false || ($comment && $comment->inputtype === 'url')) {
-            $options += [
-                'type'        => "'url'",
-                'placeholder' => "\$model->getAttributePlaceholder('$attribute')",
-            ];
-            $options = $this->var_export54($options);
-            $html = <<<HTML
-\$form->field(
-    \$model,
-    '{$attribute}',
-    $selector
-    )
-     ->textInput($options)
-    ->hint(\$model->getAttributeHint('$attribute'));
-HTML;
-            return $html;
-        } else if ($column->type === 'text' || ($comment && $comment->inputtype === 'text')) {
-            $options += [
-                'rows'        => 6,
-                'placeholder' => "\$model->getAttributePlaceholder('$attribute')",
-            ];
-            $options = $this->var_export54($options);
-            $html = <<<HTML
-\$form->field(
-    \$model,
-    '{$attribute}',
-    $selector
-    )
-     ->textarea($options)
-    ->hint(\$model->getAttributeHint('$attribute'));
-HTML;
-            return $html;
-        } else if ($column->dbType === 'date' || ($comment && $comment->inputtype === 'date')) {
-            $options += [
-                'type'    => '\\kartik\\datecontrol\\DateControl::FORMAT_DATE',
-                'options' => [
-                    'type'          => '\\kartik\\date\\DatePicker::TYPE_COMPONENT_APPEND',
-                    'pluginOptions' => [
-                        'todayHighlight' => true,
-                        'autoclose'      => true,
-                        'class'          => "'form-control'",
-                    ],
-                ],
-            ];
-            $options = $this->var_export54($options);
-            $html = <<<HTML
-\$form->field(
-    \$model,
-    '{$attribute}',
-    $selector
-    )->widget(\\kartik\\datecontrol\\DateControl::class, $options)
-    ->hint(\$model->getAttributeHint('$attribute'));
-HTML;
-            return $html;
-        } else if ($column->dbType === 'datetime' || ($comment && $comment->inputtype === 'datetime')) {
-            $options += [
-                'type'    => '\\kartik\\datecontrol\\DateControl::FORMAT_DATETIME',
-                'options' => [
-                    'type'           => '\\kartik\\datetime\\DateTimePicker::TYPE_COMPONENT_APPEND',
-                    'ajaxConversion' => true,
-                    'pickerButton'   => [
-                        'icon' => 'time',
-                    ],
-                    'pluginOptions'  => [
-                        'todayHighlight' => true,
-                        'autoclose'      => true,
-                        'class'          => "'form-control'",
-                    ],
-                ],
-            ];
-            $options = $this->var_export54($options);
-            $html = <<<HTML
-\$form->field(
-    \$model,
-    '{$attribute}',
-    $selector
-    )->widget(\\kartik\\datecontrol\\DateControl::class, $options)
-    ->hint(\$model->getAttributeHint('$attribute'));
-HTML;
-            return $html;
-        } else if ($column->dbType === 'time' || ($comment && $comment->inputtype === 'time')) {
-            $options += [
-                'pluginOptions' => [
-                    'autoclose'   => true,
-                    'showSeconds' => true,
-                    'class'       => "'form-control'",
-                ],
-            ];
-            $options = $this->var_export54($options);
-            $html = <<<HTML
-\$form->field(
-    \$model,
-    '{$attribute}',
-    $selector
-    )->widget(\\kartik\\time\\TimePicker::class, $options)
-    ->hint(\$model->getAttributeHint('$attribute'));
-HTML;
-            return $html;
-        } else if (! empty($column) && $this->checkIfUploaded($column)) {
-            $limitation = [];
-            if ($comment) {
-                if ($comment->fileSize) {
-                    $options['maxFileSize'] = $comment->fileSize;
-                }
-                if ($comment->allowedExtensions && is_array($comment->allowedExtensions)) {
-                    $extensions = [];
-                    foreach ($comment->allowedExtensions as $extension) {
-                        $extensions[] = "'$extension'";
-                    }
-                    $limitation[] = implode(",\n", $extensions);
-                }
-            }
-            $limitation = implode(",\n", $limitation);
-            $options = [
-                'pluginOptions' => [
-                    'required'               => $column->allowNull ? false : true,
-                    'initialPreview'         => "!empty(\$model->$attribute) ? [\$model->getFileUrl('$attribute')] : ''",
-                    'initialCaption'         => "\$model->$attribute",
-                    'initialPreviewAsData'   => true,
-                    'initialPreviewFileType' => "\$model->getFileType('$attribute')",
-                    'fileActionSettings'     => [
-                        'indicatorNew'      => "\$model->$attribute === null ? '' : Html::a(Html::tag('i', ['class' => 'glyphicon glyphicon-hand-down text-warning']), \$model->getFileUrl('$attribute'), ['target' => '_blank'])",
-                        'indicatorNewTitle' => "\\Yii::t('app','Download')",
-                    ],
-                    'overwriteInitial'       => true,
-                ],
-                'options'       => $options,
-                'pluginEvents'  => [
-                    'fileclear' => 'new \yii\web\JsExpression(\'function() { var prev = $("input[name=\\\'" + $(this).attr("name") + "\\\']")[0]; $(prev).val(-1); }\')',
-                ],
-            ];
-            $options = $this->var_export54($options);
-            $html = <<<HTML
-\$form->field(
-    \$model,
-    '$attribute',
-    $selector
-)->widget(\\andrej2013\\yiiboilerplate\\widget\\FileInput::class,
-    $options
-    )
-    ->hint(\$model->getAttributeHint('$attribute'));
-HTML;
-
-            return $html;
-        } else {
-            if (preg_match('/^(password|pass|passwd|passcode)$/i', $column->name) || ($comment && $comment->inputtype === 'password')) {
-                $input = 'passwordInput';
-            } else {
-                $input = 'textInput';
-            }
-            if ((is_array($column->enumValues) && count($column->enumValues) > 0) || ($comment && $comment->inputtype === 'enum')) {
-                $dropOptions = $indentMore . "[";
-                $dropdown_options = [];
-                foreach ($column->enumValues as $enumValue) {
-                    $dropdown_options[$enumValue] = "Yii::t('app', '" . Inflector::humanize($enumValue) . "')";
-                    $dropOptions .= "\n$indentMore" . str_repeat(" ", 32) . "'" . $enumValue . "' => Yii::t('app', '" . Inflector::humanize($enumValue) . "'),";
-                }
-                $dropOptions .= "\n$indentMore" . str_repeat(" ", 28) . "$indentMore]";
-                $options = [
-                    'options'       => $options,
-                    'data'          => $dropdown_options,
-                    'hideSearch'    => true,
-                    'pluginOptions' => [
-                        'allowClear' => false,
-                    ],
-                ];
-                $options = $this->var_export54($options);
-                $html = <<<HTML
-\$form->field(
-    \$model,
-    '$attribute',
-    $selector
-    )
-    ->widget(Select2::class, $options
-                    )
-    ->hint(\$model->getAttributeHint('$attribute'));
-HTML;
-                return $html;
-            } else if ($column->phpType === 'integer' || $column->phpType === 'double') {
-                $step = $column->phpType === 'double' ? 'any' : '1';
-                $min = $column->unsigned ? "'min' => '0'," : '';
-                $options += [
-                    'placeholder' => "\$model->getAttributePlaceholder('$attribute')",
-                    'type'        => "'number'",
-                    'step'        => $column->phpType === 'double' ? "'any'" : 1,
-                    'min'         => $column->unsigned ? 0 : "''",
-                ];
-                $options = $this->var_export54($options);
-                $html = <<<HTML
-\$form->field(
-    \$model,
-    '$attribute',
-    $selector
-    )
-    ->$input($options)
-    ->hint(\$model->getAttributeHint('$attribute'))
-HTML;
-                return $html;
-            } else if ($column->phpType !== 'string' || $column->size === null || ($comment && $comment->inputtype === 'string')) {
-                $options += [
-                    'placeholder' => "\$model->getAttributePlaceholder('$attribute')",
-                ];
-                $options = $this->var_export54($options);
-                $html = <<<HTML
-\$form->field(
-    \$model,
-    '$attribute',
-    $selector
-    )
-    ->$input($options)
-    ->hint(\$model->getAttributeHint('$attribute'))
-HTML;
-                return $html;
-            } else {
-                $options += [
-                    'maxlenght'   => true,
-                    'placeholder' => "\$model->getAttributePlaceholder('$attribute')",
-                    'input'       => "'#'.Html::getInputId(\$model, '$attribute') . \$caller_id",
-                ];
-                $options = $this->var_export54($options);
-                $html = <<<HTML
-\$form->field(
-    \$model,
-    '$attribute',
-    $selector
-    )
-    ->$input($options)
-    ->hint(\$model->getAttributeHint('$attribute'))
-HTML;
-                return $html;
-            }
         }
     }
 
@@ -728,88 +396,6 @@ HTML;
                 ?>
                 $append
                 <?php";
-    }
-
-    /**
-     * DropDown-Field Select2 Generator Method
-     *
-     * Generates code for active field dropdown by using the provider queue
-     *
-     * @param ColumnSchema $column
-     * @param null         $model
-     *
-     * @return mixed|string
-     */
-    public function activeFieldDropDown(ColumnSchema $column, $model = null)
-    {
-        if (($comment = $this->extractComments($column)) && isset($comment->inputtype->depend) && isset($comment->inputtype->depend->on) && isset($comment->inputtype->depend->onAttribute) && isset($comment->inputtype->depend->onRelation)) {
-            return $this->activeFieldDepend($column, $comment);
-        }
-        $attribute = $column->name;
-        $tableSchema = $this->getTableSchema();
-
-        $foreignLabelAttribute = "toString";
-        $fullModel = $this->fetchForeignClass($attribute);
-        if ($fullModel == null) {
-            throw new \yii\base\Exception('Relation for attribute ' . $attribute . ' is not defined in database');
-        }
-        $foreignPk = $fullModel::primaryKey()[0];
-        $reflection = new \ReflectionClass($fullModel);
-        $shortModel = $reflection->getShortName();
-        $attributeLabel = $this->fetchForeignAttribute($attribute);
-
-        if ($attributeLabel == null) {
-            $attributeLabel = $attribute;
-        }
-
-        $column = $tableSchema->columns[$attribute];
-        $foreignController = $this->getForeignController($fullModel);
-
-        $related_form_options = [
-            'relatedController' => "'$foreignController'",
-            'selector'          => "'$attribute' . (\$is_popup ? '_popup_' . \$caller_id : '')",
-            'primaryKey'        => "'$foreignPk'",
-            'modelName'         => $this->generateString($shortModel),
-        ];
-        $related_form_options = $this->var_export54($related_form_options);
-        $ajax_options = [
-            'url'      => "\\yii\\helpers\\Url::to(['list'])",
-            'dataType' => "'json'",
-            'data'     => "new \\yii\\web\\JsExpression('function(params) {
-                return {
-                    q:params.term, m: \"" . $shortModel . "\"
-                };
-            }')",
-        ];
-        $ajax_options = $this->var_export54($ajax_options);
-        $options = [
-            'data'          => "$fullModel::find()->count() > 50 ? null : ArrayHelper::map($fullModel::find()->all(), '$attributeLabel', 'toString')",
-            'initValueText' => "$fullModel::find()->count() > 50 ? \\yii\\helpers\\ArrayHelper::map($fullModel::find()->andWhere(['$attributeLabel' => \$model->{$attribute}])->all(), '$attributeLabel', 'toString') : ''",
-            'options'       => [
-                'placeholder' => $this->generateString('Select a value...'),
-                'id'          => "'$attribute' . (\$is_popup ? '_from' . \$caller_id : '')",
-            ],
-            'pluginOptions' => [
-                'allowClear'         => $column->allowNull ? true : false,
-                'minimumInputLength' => "$fullModel::find()->count() > 50 ? 3 : false",
-                'ajax'               => "$fullModel::find()->count() > 50 ? $ajax_options : null",
-            ],
-            'is_popup'      => '$is_popup',
-            'addon'         => [
-                'append' => [
-                    'content'  => [
-                        "RelatedForms::widget($related_form_options)",
-                    ],
-                    'asButton' => true,
-                ],
-            ],
-        ];
-        $options = $this->var_export54($options);
-        $html = <<<HTML
-\$form->field(\$model, '$attribute')
-        ->widget(Select2::class, $options);
-HTML;
-        return $html;
     }
 
     /**
@@ -1029,7 +615,22 @@ HTML;
         return false;
     }
 
-    public function var_export54($var, $indent = '')
+    /**
+     * @param \yii\db\ColumnSchema $column
+     * @return bool
+     */
+    public function isUpload(ColumnSchema $column)
+    {
+        $comment = $this->getComment($column);
+        return preg_match('/(_upload|_file)$/i', $column->name) || $comment->type == 'upload' || $comment->type == 'file';
+    }
+
+    /**
+     * @param        $var
+     * @param string $indent
+     * @return mixed|string
+     */
+    public function var_export54($var, $indent = '', $encode_keys = true)
     {
         switch (gettype($var)) {
             case 'string':
@@ -1039,7 +640,7 @@ HTML;
                 $indexed = array_keys($var) === range(0, count($var) - 1);
                 $r = [];
                 foreach ($var as $key => $value) {
-                    $r[] = "$indent    " . ($indexed ? '' : ("'" . $this->var_export54($key) . "'") . ' => ') . $this->var_export54($value, "$indent    ");
+                    $r[] = "$indent    " . ($indexed ? '' : (($encode_keys ? "'" : "") . $this->var_export54($key) . ($encode_keys ? "'" : "")) . ' => ') . $this->var_export54($value, "$indent    ");
                 }
 
                 return "[\n" . implode(",\n", $r) . "\n" . $indent . ']';
@@ -1050,4 +651,69 @@ HTML;
         }
     }
 
+    /**
+     * @param \yii\db\ColumnSchema $column
+     * @return mixed|\stdClass
+     */
+    public function getComment(ColumnSchema $column)
+    {
+        return json_decode($column->comment) ?? new \stdClass();
+    }
+
+    public function getAttributeType($attribute, $model = null)
+    {
+        if ($attribute instanceof ColumnSchema) {
+            $column = $attribute;
+            $attribute = $column->name;
+        } else {
+            $column = $this->getColumnByAttribute($attribute, $model);
+        }
+        $comment = $this->getComment($column);
+        if ($comment->type === 'hidden') {
+            return self::TYPE_HIDDEN;
+        } else if ($this->isUpload($column)) {
+            return self::TYPE_UPLOAD;
+        } else if ($column->phpType === 'boolean' || $column->dbType === 'tinyint(1)' || substr($column->name, 0, 3) == 'is_' || substr($column->name, 0, 4) == 'has_' || ($comment->type === 'checkbox')) {
+            return self::TYPE_CHECKBOX;
+        } else if (is_array($column->enumValues) && count($column->enumValues) > 0) {
+            return self::TYPE_ENUM;
+        } else if ($column->type === 'string' && strtolower($comment->type) === 'qr_code') {
+            return self::TYPE_QR_CODE;
+        } else if ($column->type === 'string' && strtolower($comment->type) === 'google_map') {
+            return self::TYPE_GOOGLE_MAP;
+        } else if ($column->type === 'text' && ($comment->type === 'editor' || (strpos($column->name, '_html') !== false))) {
+            return self::TYPE_HTML_EDITOR;
+        } else if ($column->dbType === 'date' || $comment->type === 'date') {
+            return self::TYPE_DATE;
+        } else if ($column->dbType === 'datetime' || $comment->type === 'datetime') {
+            return self::TYPE_DATETIME;
+        } else if ($column->dbType === 'time' || $comment->type === 'time') {
+            return self::TYPE_TIME;
+        } else if (class_exists($this->modelClass) && $this->getRelationByColumn($this->modelClass, $column)) {
+            if ($comment->type === 'depend') {
+                return self::TYPE_DEPEND;
+            }
+            return self::TYPE_SELECT2;
+        } else if ($column->type == 'string' && (strtolower($comment->type) == 'color' || (strpos($column->name, '_color') !== false))) {
+            return self::TYPE_COLOR_PICKER;
+        } else if ($column->phpType === 'integer' || $column->phpType === 'double') {
+            return self::TYPE_NUMBER;
+        } else if ($column->type === 'text' || $comment->type === 'text') {
+            return self::TYPE_TEXT;
+        } else if ($column->type === 'string') {
+            if (strpos($column->name, 'email') !== false || $comment->type === 'email') {
+                return self::TYPE_EMAIL;
+            } else if (strpos($column->name, 'telephone') !== false || strpos($column->name, '_tel') !== false || $comment->type === 'telephone' || strpos($column->name, 'phone') !== false || $comment->type === 'phone') {
+                return self::TYPE_PHONE;
+            } else if (strpos($column->name, 'url') !== false || $comment->type === 'url') {
+                return self::TYPE_URL;
+            } else if (preg_match('/^(password|pass|passwd|passcode)$/i', $column->name) || $comment->type === 'password') {
+                return self::TYPE_PASSWORD;
+            } else {
+                return self::TYPE_INPUT;
+            }
+        } else {
+            return self::TYPE_INPUT;
+        }
+    }
 }

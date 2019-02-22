@@ -6,6 +6,7 @@ use andrej2013\yiiboilerplate\models\ActiveRecord;
 use andrej2013\yiiboilerplate\helpers\CrudHelper;
 use Yii;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Json;
 use yii\web\Controller;
 use yii\web\HttpException;
 use yii\filters\AccessControl;
@@ -96,6 +97,7 @@ abstract class CrudController extends Controller
     protected $relatedTypeForm = RelatedForms::TYPE_MODAL;
 
     public $customUploadFields = [];
+
     /**
      * @return \andrej2013\yiiboilerplate\models\ActiveRecord
      */
@@ -161,10 +163,11 @@ abstract class CrudController extends Controller
                             'delete',
                             'delete-multiple',
                             'related-form',
-                            'update-multiple',
-                            'entry-details',
                             'list',
                             'depend',
+                            'typehead',
+                            'select-search',
+                            'depending',
                         ],
                         'roles'   => ['@'],
                     ],
@@ -219,7 +222,7 @@ abstract class CrudController extends Controller
         Url::remember($url);
         Tabs::rememberActiveState();
         return $this->render('view', [
-            'model'    => $this->findModel($id),
+            'model' => $this->findModel($id),
         ]);
     }
 
@@ -251,9 +254,16 @@ abstract class CrudController extends Controller
                 // Save translations
                 \Yii::$app->session->setFlash('success', \Yii::t('app', 'Saved {model}', ['model' => $model->toString]));
                 if (isset($_POST['submit-default'])) {
+                    $url = $_GET;
+                    array_unshift($url, 'update');
+                    $url['id'] = $model->id;
+                    return $this->redirect($url);
                     return $this->redirect(['update', 'id' => $model->id]);
                 } else if (isset($_POST['submit-new'])) {
-                    return $this->redirect(['create']);
+                    $url = $_GET;
+                    array_unshift($url, 'create');
+                    return $this->redirect($url);
+                    return $this->redirect(['create', $_GET]);
                 } else {
                     return $this->redirect(['index']);
                 }
@@ -267,10 +277,12 @@ abstract class CrudController extends Controller
         if (Yii::$app->request->isAjax) {
             return $this->renderAjax('update', [
                 'model' => $model,
+                'hide'  => Yii::$app->request->get('hide'),
             ]);
         }
         return $this->render('create', [
             'model' => $model,
+            'hide'  => Yii::$app->request->get('hide'),
         ]);
     }
 
@@ -308,8 +320,15 @@ abstract class CrudController extends Controller
             // Save translations
             \Yii::$app->session->setFlash('success', \Yii::t('app', 'Saved {model}', ['model' => $model->toString]));
             if (isset($_POST['submit-default'])) {
+                $url = $_GET;
+                array_unshift($url, 'update');
+                $url['id'] = $model->id;
+                return $this->redirect($url);
                 return $this->redirect(['update', 'id' => $model->id]);
             } else if (isset($_POST['submit-new'])) {
+                $url = $_GET;
+                array_unshift($url, 'create');
+                return $this->redirect($url);
                 return $this->redirect(['create']);
             } else {
                 return $this->redirect(['index']);
@@ -317,11 +336,13 @@ abstract class CrudController extends Controller
         } else {
             if (Yii::$app->request->isAjax) {
                 return $this->renderAjax('update', [
-                    'model'           => $model,
+                    'model' => $model,
+                    'hide'  => Yii::$app->request->get('hide'),
                 ]);
             }
             return $this->render('update', [
-                'model'           => $model,
+                'model' => $model,
+                'hide'  => Yii::$app->request->get('hide'),
             ]);
         }
     }
@@ -427,6 +448,7 @@ abstract class CrudController extends Controller
                 'relation'        => isset($_GET['relation']) ? $_GET['relation'] : '',
                 'relationId'      => isset($_GET['relationId']) ? $_GET['relationId'] : '',
                 'relationIdValue' => isset($_GET['relationIdValue']) ? $_GET['relationIdValue'] : '',
+                'hide'            => isset($_GET['hide']) ? $_GET['hide'] : null,
             ],
         ];
         return $actions;
@@ -474,5 +496,17 @@ abstract class CrudController extends Controller
     {
         // Change the model
         return $model;
+    }
+
+    public function actionTypehead($attribute, $q)
+    {
+        $model = $this->model;
+        echo Json::encode($model::typeahead($attribute, $q));
+    }
+
+    public function actionSelectSearch($q)
+    {
+        $model = $this->model;
+        echo Json::encode($model::selectSearch($q));
     }
 }

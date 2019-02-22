@@ -16,7 +16,6 @@ use yii\helpers\Html;
 /**
  * @var yii\web\View $this
  * @var <?= ltrim($generator->modelClass, '\\') ?> $model
- * @var string $relatedTypeForm
  */
 
 $this->title = <?= $generator->generateString('Create') ?>;
@@ -48,6 +47,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
         <?= '<?= ' ?>$this->render('_form', [
             'model' => $model,
+            'hide'  => $hide,
         ]); ?>
 
     </div>

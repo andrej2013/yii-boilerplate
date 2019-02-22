@@ -49,7 +49,7 @@ class RecoveryForm extends \dektrium\user\models\RecoveryForm
             \Yii::$app->session->setFlash(
                 'danger',
                 \Yii::t(
-                    'user',
+                    'app',
                     'User with email address {email} not exist',
                     ['email' => Html::tag('strong', $this->email)]
                 )
@@ -58,7 +58,7 @@ class RecoveryForm extends \dektrium\user\models\RecoveryForm
         }
         \Yii::$app->session->setFlash(
             'info',
-            \Yii::t('user', 'An email has been sent with instructions for resetting your password')
+            \Yii::t('app', 'An email has been sent with instructions for resetting your password')
         );
         return true;
     }

@@ -2,8 +2,9 @@
 
 namespace andrej2013\yiiboilerplate\modules\user\models\base;
 
+use andrej2013\yiiboilerplate\models\ActiveRecord;
 use Yii;
-use \app\models\ActiveRecord;
+use app\models\ActiveRecord as BaseModel;
 use yii\db\Query;
 
 /**

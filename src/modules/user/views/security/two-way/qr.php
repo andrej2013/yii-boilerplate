@@ -17,15 +17,17 @@ use \andrej2013\yiiboilerplate\modules\user\models\UserAuthCode;
  * @var string                         $qr
  */
 
-$this->title = Yii::t('user', 'Sign in');
+$this->title = Yii::t('app', 'Sign in');
 
 
 $checkUrl = \yii\helpers\Url::toRoute('/user/security/check-code');
 $user_id = $model->user->id;
 $refreshLink = \yii\helpers\Url::toRoute('/user/security/refresh-code');
+echo Html::beginTag('div', ['class' => 'text-center']);
 echo Html::img(\andrej2013\yiiboilerplate\modules\user\models\UserAuthCode::generateQr($qr), [
     'class' => 'qr-code-image',
 ]);
+echo Html::endTag('div');
 $form = ActiveForm::begin([
     'id' => 'login-form',
     'action' => \yii\helpers\Url::toRoute('/user/security/check-code'),

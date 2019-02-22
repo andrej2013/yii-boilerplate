@@ -161,12 +161,10 @@ class GoogleMap extends Object
     public function render()
     {
         switch ($this->format) {
-            case self::IFRAME:
-                return $this->getIframe();
-                break;
             case self::IMAGE:
                 return $this->getImage();
                 break;
+            case self::IFRAME:
             default:
                 return $this->getIframe();
         }

@@ -13,12 +13,6 @@ use yii\web\Controller;
 
 class FaqController extends Controller
 {
-    public function init()
-    {
-        parent::init();
-        $this->layout = '@andrej2013-backend-views/layouts/main.php';
-    }
-
     /**
      * @inheritdoc
      */
@@ -26,7 +20,7 @@ class FaqController extends Controller
     {
         return [
             'access' => [
-                'class' => AccessControl::className(),
+                'class' => AccessControl::class,
                 'rules' => [
                     [
                         'allow' => true,

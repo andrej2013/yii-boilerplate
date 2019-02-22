@@ -85,7 +85,7 @@ trait ModelTrait
                         $name = $modelGenerator->generateRelationName(
                             [$relation],
                             $model->getTableSchema(),
-                            substr($method->name, 3),
+                            lcfirst(substr($method->name, 3)),
                             $relation->multiple
                         );
                         $stack[$name] = $relation;
@@ -114,4 +114,28 @@ trait ModelTrait
 
         return $route;
     }
+    
+    public function createRelationRoute($relation, $action = null)
+    {
+        $route = $this->pathPrefix.Inflector::camel2id(
+                $this->generateRelationTo($relation),
+                '-',
+                true
+            ).($action ? ('/'.$action) : '');
+
+        return $route;
+    }
+    
+    public function createRoute($action = null)
+    {
+        $class = new \ReflectionClass($this->modelClass);
+        $route = Inflector::variablize($class->getShortName());
+        $route = $this->pathPrefix.Inflector::camel2id(
+                $route,
+                '-',
+                true
+            ).($action ? ('/'.$action) : '');
+        return $route;
+    }
+    
 }

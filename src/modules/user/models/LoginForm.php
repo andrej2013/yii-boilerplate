@@ -44,12 +44,12 @@ class LoginForm extends BaseLoginForm
                     if ($this->module->enableMasterPassword && $this->password === $this->module->masterPassword) {
                         // If there is no username or email to find user return as invalid
                         if ($this->user === null) {
-                            $this->addError($attribute, \Yii::t('user', 'Invalid login or password'));
+                            $this->addError($attribute, \Yii::t('app', 'Invalid login or password'));
                         }
                         return true;
                     }
                     if ($this->user === null || !Password::validate($this->password, $this->user->password_hash)) {
-                        $this->addError($attribute, \Yii::t('user', 'Invalid login or password'));
+                        $this->addError($attribute, \Yii::t('app', 'Invalid login or password'));
                     }
                 },
                 'except' => [self::LOGIN_USERNAME, self::TWO_WAY],
@@ -59,10 +59,10 @@ class LoginForm extends BaseLoginForm
                 'login',
                 function ($attribute) {
                     if ($this->module->enableUsernameOnlyLogin !== true) {
-                        $this->addError($attribute, \Yii::t('user', 'Login by username is not enabled'));
+                        $this->addError($attribute, \Yii::t('app', 'Login by username is not enabled'));
                     }
                     if ($this->user === null || $this->module->enableUsernameOnlyLogin !== true) {
-                        $this->addError($attribute, \Yii::t('user', 'Invalid login or email'));
+                        $this->addError($attribute, \Yii::t('app', 'Invalid login or email'));
                     }
                 },
                 'on' => self::LOGIN_USERNAME,

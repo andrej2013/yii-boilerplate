@@ -205,11 +205,11 @@ trait ProviderTrait
      * @param bool $showAllRecords
      * @return mixed
      */
-    public function relationGrid($name, $relation, $showAllRecords = false)
+    public function relationGrid($name, $relation, $showAllRecords = false, $attachButton = null)
     {
         Yii::trace("calling provider queue for '$name'", __METHOD__);
 
-        return $this->callProviderQueue(__FUNCTION__, $name, $relation, $showAllRecords);
+        return $this->callProviderQueue(__FUNCTION__, $name, $relation, $showAllRecords, $attachButton);
     }
 
     /**
@@ -229,70 +229,7 @@ trait ProviderTrait
             Yii::trace("Table column detected for '{$attribute}'", __METHOD__);
         }
         $comment = $this->extractComments($column);
-        if (is_array($column->enumValues) && count($column->enumValues) > 0) {
-            if ($template === 'index') {
-                $dropOptions = "[";
-                foreach ($column->enumValues as $enumValue) {
-                    $dropOptions .= "\n" . str_repeat(' ', 12) . "'" .
-                        $enumValue . "' => Yii::t('app', '" . Inflector::humanize($enumValue) . "'),";
-                }
-                $dropOptions .= "\n" . str_repeat(' ', 8) . "],";
-            }
-            return "
-                [
-        " . ($template !== 'index' ? str_repeat(' ', 12) : '') . "'attribute' => '$column->name',
-        " . ($template !== 'index' ? str_repeat(' ', 12) : '') . "'content' => function (\$model) {
-            " . ($template !== 'index' ? str_repeat(' ', 12) : '') . "return \\Yii::t('app', \$model->$column->name);
-        " . ($template !== 'index' ? str_repeat(' ', 12) : '') . "}," .
-                ($template === 'index' ? "\n" . str_repeat(' ', 8) . "'filter' => $dropOptions
-        'filterType' => GridView::FILTER_SELECT2,
-        'class' => '\\kartik\\grid\\DataColumn',
-        'filterWidgetOptions' => [
-            'options' => [
-                'placeholder' => '',
-                'multiple' => true,
-            ],
-            'pluginOptions' => [
-                'allowClear' => true,
-            ]
-        ]," : "")
-                . "\n" . str_repeat(' ', 4) . ($template !== 'index' ? str_repeat(' ', 12) : '') . "]";
-        } elseif ($column->phpType === 'boolean' || (strpos($column->name, "is_") === 0)) {
-            if ($template === 'index') {
-                return "[
-        'attribute' => '$column->name',
-        'class' => '\\kartik\\grid\\BooleanColumn',
-        'trueLabel' => \\Yii::t('app','Yes'),
-        'falseLabel' => \\Yii::t('app','No'),
-        'content' => function (\$model) {
-            return \$model->$column->name == 1 ? Yii::t('app', 'Yes') : Yii::t('app', 'No');
-        },
-    ]";
-            }
-            $format = 'boolean';
-        } elseif ($comment && $comment->inputtype == strtolower('qrcode')) {
-            if ($template === 'index') {
-                return "[
-        'attribute' => '$column->name',
-        'format' => 'html',
-        'content' => function (\$model) {
-            return Html::img(\$model->renderQrCode('$column->name'));
-        },
-    ]";
-            }
-        } elseif ($comment && $comment->inputtype == strtolower('googlemap')) {
-            if ($template === 'index') {
-                return "[
-        'attribute' => '$column->name',
-        'format' => 'html',
-        'content' => function (\$model) {
-			return Html::img(\$model->renderGoogleMap('$column->name', [
-				'format' => \\andrej2013\\yiiboilerplate\\components\\GoogleMap::IMAGE,
-			]));
-        },
-    ]";
-            }
-        } elseif ($column->type === 'text') {
+        if ($column->type === 'text') {
             // For texts, we want to limit to 500 char because otherwise it's unreadable
             return "[
         'attribute' => '$column->name',
@@ -301,53 +238,6 @@ trait ProviderTrait
                 ", 0, 500) . '...' : \$model->" . $column->name . ");
         },
     ]";
-        } elseif ($column->dbType == 'date' || ($column->dbType == 'datetime' && $template === 'index')) {
-            if ($template === 'index') {
-                $format = $column->dbType == 'datetime' ? 'Yii::$app->formatter->momentJsDateTimeFormat' : 'Yii::$app->formatter->momentJsDateFormat';
-                return "[
-        'attribute' => '$column->name',
-        'content' => function (\$model) {
-            return \\Yii::\$app->formatter->as" . ucfirst($column->dbType) . "(\$model->$column->name);
-        },
-        'class' => '\\kartik\\grid\\DataColumn',
-        'format' => '$column->dbType',
-        'filterType' => GridView::FILTER_DATE_RANGE,
-        'filterWidgetOptions' => [
-            'presetDropdown' => true,
-            'pluginEvents' => [
-                'apply.daterangepicker' => 'function(ev, picker) {
-                    if($(this).val() == \"\") {
-                        $(this).val(picker.startDate.format(picker.locale.format) + picker.locale.separator +
-                        picker.endDate.format(picker.locale.format)).trigger(\"change\");
-                    }
-                }',
-                'show.daterangepicker' => 'function(ev, picker) {
-                    picker.container.find(\".ranges\").off(\"mouseenter.daterangepicker\", \"li\");
-                    if($(this).val() == \"\") {
-                        picker.container.find(\".ranges .active\").removeClass(\"active\");
-                    }
-                }',
-                'cancel.daterangepicker' => 'function(ev, picker) {
-                    if($(this).val() != \"\") {
-                        $(this).val(\"\").trigger(\"change\");
-                    }
-                }'
-            ],
-            'pluginOptions' => [
-                'opens'=>'left',
-                'locale' => [
-                    'format' => $format,
-                    'separator' => ' TO ',
-                ]
-            ],
-        ],
-    ]";
-            }
-            $format = 'date';
-        } elseif ((stripos($column->name, 'time') !== false && $column->phpType === 'integer') ||
-            $column->dbType == 'datetime'
-        ) {
-            $format = 'datetime';
         } elseif (stripos($column->name, 'email') !== false) {
             $format = 'email';
         } elseif (stripos($column->name, 'url') !== false) {

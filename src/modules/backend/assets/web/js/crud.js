@@ -5,6 +5,14 @@ $(document).ready(function () {
         } else {
             $(this).parent('div').find('button.edit_select').attr('disabled', 'disabled');
         }
+        var attr = $(this).attr('data-krajee-depdrop');
+        if (typeof attr !== typeof undefined && attr !== false) {
+            if ($(this).is(':disabled')) {
+                $(this).parent('div').find('button.add_select').attr('disabled', 'disabled');
+            } else {
+                $(this).parent('div').find('button.add_select').removeAttr('disabled');
+            }
+        }
     });
     $('select').each(function () {
         if ($(this).val()) {

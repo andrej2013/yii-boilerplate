@@ -17,16 +17,17 @@ if (empty($safeAttributes)) {
     $safeAttributes = $model->getTableSchema()->columnNames;
 }
 $urlParams = $generator->generateUrlParams();
+
 echo "<?php\n";
 ?>
 
-use yii\helpers\ArrayHelper;
-use andrej2013\yiiboilerplate\widget\Select2;
-use yii\bootstrap\ActiveForm;
 use \dmstr\bootstrap\Tabs;
+use yii\bootstrap\ActiveForm;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Inflector;
 use yii\helpers\Url;
-use kartik\helpers\Html;
+use yii\helpers\Html;
+use andrej2013\yiiboilerplate\widget\Select2;
 use andrej2013\yiiboilerplate\widget\DepDrop;
 use andrej2013\yiiboilerplate\modules\backend\widgets\RelatedForms;
 
@@ -64,7 +65,7 @@ $caller_id = $is_popup ? ('_from_' . $caller_id) : '';
         'layout' => '<?= !$generator->twoColumnsForm ? $generator->formLayout : 'default' ?>',
         'enableClientValidation' => true,
         'errorSummaryCssClass' => 'error-summary alert alert-error',
-        'action' => $action,
+        'action' => \yii\helpers\Url::current(),
         'options' => [
             'name' => '<?= $model->formName() ?>',
         <?php echo ($multipart === true) ?
@@ -83,19 +84,6 @@ $caller_id = $is_popup ? ('_from_' . $caller_id) : '';
                 }
 
                 $field = $generator->activeField($attribute, $model);
-
-                // Find foreign-key columns for dropdown-Fields
-                // check if column is no primarykey and column->name ends with "_id"
-                $isForeignColumn =
-//                    !$column->isPrimaryKey &&
-                    (($temp = strlen($column->name) - strlen('_id')) >= 0 &&
-                        strpos($column->name, '_id', $temp) !== false
-                    );
-
-                if ($isForeignColumn) {
-                    $field = $generator->activeFieldDropDown($column, $model);
-                }
-
                 $prepend = $generator->prependActiveField($attribute, $model);
                 $append = $generator->appendActiveField($attribute, $model);
 
@@ -117,6 +105,14 @@ $caller_id = $is_popup ? ('_from_' . $caller_id) : '';
                 ?>
 <?php
             }
+        $model = new $generator->modelClass;
+        if (in_array('fileBehavior', array_keys($model->behaviors()))) {
+            $lines[] = "<?= \$form->field(\$model, 'attachments')
+        ->widget(\\andrej2013\\yiiboilerplate\\widget\\Attachment::class, [
+                            'model' => \$model,
+                            'type'  => \\andrej2013\\yiiboilerplate\\widget\\Attachment::INPUT,
+                        ]) ?>";
+        }
             echo implode("\n", $lines);
             ?>
         <?=$generator->twoColumnsForm ? \yii\helpers\Html::tag('div', null, ['class' => 'clearfix']) : ''?>
@@ -227,6 +223,5 @@ $caller_id = $is_popup ? ('_from_' . $caller_id) : '';
             ?>
         <?= "<?php " ?>} ?>
         <?= "<?php " ?>ActiveForm::end(); ?>
+    <div class="clearfix"></div>
 </div>
-<?= "<?php\n" ?>
-\yii\helpers\Html::tag('div', null, ['class' => 'clearfix']);

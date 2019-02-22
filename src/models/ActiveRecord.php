@@ -18,15 +18,14 @@ use yii\db\Expression;
 /**
  * This is the andrej2013 base-model class for table "TwActiveRecord".
  *
- * @property string $created_at
- * @property string $updated_at
- * @property string $deleted_at
+ * @property string  $created_at
+ * @property string  $updated_at
+ * @property string  $deleted_at
  * @property integer $created_by
  * @property integer $updated_by
  * @property integer $deleted_by
  *
  */
-
 class ActiveRecord extends BaseActiveRecord
 {
     /**
@@ -45,32 +44,28 @@ class ActiveRecord extends BaseActiveRecord
     public function behaviors()
     {
         $behaviors = [];
-        if (getenv('CRUD')) {
-            $behaviors[] = BlameableBehavior::class;
-            $behaviors[] = [
-                'class' => TimestampBehavior::class,
-                'createdAtAttribute' => 'created_at',
-                'updatedAtAttribute' => 'updated_at',
-                'value' => new Expression('NOW()'),
-            ];
-            $behaviors['arhistory'] = [
-                'class' => HistoryBehavior::class,
-                'skipAttributes' => [
-                    'created_at',
-                    'updated_at',
-                    'created_by',
-                    'updated_by'
-                ],
-                'allowEvents' => [
-                    HistoryBehavior::EVENT_UPDATE,
-                    HistoryBehavior::EVENT_DELETE,
-                    HistoryBehavior::EVENT_INSERT,
-                ]
-            ];
-        }
-        if (getenv('SOFT_DELETE') && getenv('CRUD')) {
-            $behaviors[] = SoftDelete::class;
-        }
+        $behaviors[] = BlameableBehavior::class;
+        $behaviors[] = [
+            'class'              => TimestampBehavior::class,
+            'createdAtAttribute' => 'created_at',
+            'updatedAtAttribute' => 'updated_at',
+            'value'              => new Expression('NOW()'),
+        ];
+        $behaviors['arhistory'] = [
+            'class'          => HistoryBehavior::class,
+            'skipAttributes' => [
+                'created_at',
+                'updated_at',
+                'created_by',
+                'updated_by',
+            ],
+            'allowEvents'    => [
+                HistoryBehavior::EVENT_UPDATE,
+                HistoryBehavior::EVENT_DELETE,
+                HistoryBehavior::EVENT_INSERT,
+            ],
+        ];
+        $behaviors['SoftDelete'] = SoftDelete::class;
         return $behaviors;
     }
 
@@ -83,12 +78,12 @@ class ActiveRecord extends BaseActiveRecord
     {
         // Try the obvious palceholders
         $placeholders = $this->attributePlaceholders();
-        if (!empty($placeholders[$field])) {
+        if (! empty($placeholders[$field])) {
             return $placeholders[$field];
         }
         // Try with labels
         $labels = $this->attributeLabels();
-        if (!empty($labels[$field])) {
+        if (! empty($labels[$field])) {
             return $labels[$field];
         }
         // Default is to inflect the field name
@@ -112,13 +107,11 @@ class ActiveRecord extends BaseActiveRecord
     public static function find($removedDeleted = true)
     {
         $model = new \andrej2013\yiiboilerplate\models\ActiveQuery(get_called_class());
-        if (getenv('SOFT_DELETE') && $removedDeleted === true) {
-            $reflection = new \ReflectionClass(get_called_class());
-            if ($reflection->hasMethod('tableAlias')) {
-                $model->andWhere([static::tableAlias() . '.deleted_at' => null]);
-            } else {
-                $model->andWhere([static::tableName() . '.deleted_at' => null]);
-            }
+        $reflection = new \ReflectionClass(get_called_class());
+        if ($reflection->hasMethod('tableAlias')) {
+            $model->andWhere([static::tableAlias() . '.deleted_at' => null]);
+        } else {
+            $model->andWhere([static::tableName() . '.deleted_at' => null]);
         }
         return $model;
     }
@@ -141,41 +134,7 @@ class ActiveRecord extends BaseActiveRecord
      */
     public static function findDeleted()
     {
-        return new \andrej2013\yiiboilerplate\models\TwActiveQuery(get_called_class());
-    }
-
-    /**
-     * Export model attributes to ENV
-     * @param array $attributes
-     * @throws \Exception
-     */
-    public function toEnv(array $attributes = [])
-    {
-        $reflection = new \ReflectionClass($this);
-        $modelName = $reflection->getShortName();
-        if (empty($attribute)) {
-            foreach ($this->attributes as $key => $val) {
-                $attributes[] = $key;
-            }
-        }
-        foreach ($attributes as $attribute) {
-            if (!$this->hasAttribute($attribute)) {
-                throw new \Exception("Model $modelName don't have attribute: $attribute");
-            }
-            $var = strtoupper($modelName . '_' . $attribute);
-            $value = $this->{$attribute};
-            // If PHP is running as an Apache module and an existing
-            // Apache environment variable exists, overwrite it
-            if (function_exists('apache_getenv') && function_exists('apache_setenv') && apache_getenv($var)) {
-                apache_setenv($var, $value);
-            }
-
-            if (function_exists('putenv')) {
-                putenv("$var=$value");
-            }
-            $_ENV[$var] = $value;
-            $_SERVER[$var] = $value;
-        }
+        return new \andrej2013\yiiboilerplate\models\ActiveQuery(get_called_class());
     }
 
     /**
@@ -208,5 +167,28 @@ class ActiveRecord extends BaseActiveRecord
     public function deletable()
     {
         return true;
+    }
+
+    public static function typeahead($attribute, $q)
+    {
+        $out = [];
+        $data = static::find()
+                      ->select($attribute)
+                      ->andWhere(['LIKE', $attribute, $q])
+                      ->distinct()
+                      ->orderBy($attribute)
+                      ->asArray()
+                      ->all();
+        foreach ($data as $d) {
+            $out[] = [
+                'value' => $d[$attribute],
+            ];
+        }
+        return $out;
+    }
+    
+    public static function selectSearch($q)
+    {
+        return [];
     }
 }

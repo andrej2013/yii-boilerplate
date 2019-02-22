@@ -5,9 +5,9 @@
  */
 
 use yii\db\Schema;
-use andrej2013\yiiboilerplate\TwMigration;
+use andrej2013\yiiboilerplate\Migration;
 
-class m170717_073725_user_auth_code extends TwMigration
+class m170717_073725_user_auth_code extends Migration
 {
     public function up()
     {

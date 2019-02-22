@@ -3,20 +3,26 @@ $.fn.hasAttr = function (name) {
 };
 
 (function ($) {
-    
+
     // Register add and edit clicks
     $(document.body).on('click', 'button.add_select, button.edit_select', function () {
-        var update   = $(this).hasAttr('data-update');
-        var owner_id = $(this).closest('div.select2-bootstrap-append').find('select').attr('id');
-        var url      = $(this).attr('data-url');
-        var model_id = $(this).closest('div.select2-bootstrap-append').find('select').val();
-        var pk       = $(this).attr('data-pk');
-        var modal    = $('#RelatedFormModal');
+        var update      = $(this).hasAttr('data-update');
+        var owner_id    = $(this).closest('div.select2-bootstrap-append').find('select').attr('id');
+        var url         = $(this).attr('data-url');
+        var model_id    = $(this).closest('div.select2-bootstrap-append').find('select').val();
+        var pk          = $(this).attr('data-pk');
+        var depend      = $(this).attr('data-depend');
+        var dependLink  = $(this).attr('data-depend-link');
+        var formName    = $(this).attr('data-form-name');
+        var modal       = $('#RelatedFormModal');
         $(modal).attr('data-update', update);
         $(modal).attr('data-select2', owner_id);
         $(modal).attr('data-url', url);
         $(modal).attr('data-model-id', model_id);
         $(modal).attr('data-pk', pk);
+        $(modal).attr('data-depend', depend);
+        $(modal).attr('data-depend-link', dependLink);
+        $(modal).attr('data-form-name', formName);
     });
     $.fn.relatedModal = function () {
         // this.selector  = settings.selector;
@@ -24,21 +30,25 @@ $.fn.hasAttr = function (name) {
         var attr_to_remove = ['update', 'select2', 'url', 'model-id', 'pk'];
         var temp           = this;
         var self           = this;
-            loadForm       = function () {
-                console.log(self);
-                return new Promise(function (resolve, reject) {
-                    var url = self.attr('data-url');
-                    if (self.attr('data-update') == 'true') {
-                        url += '&' + self.attr('data-pk') + '=' + $('#' + self.attr('data-select2')).val();
-                    }
-                    $.get(url)
-                        .done(function (data) {
-                            $('.loader').addClass('hide');
-                            resolve(data);
-                        });
-                })
-            },
-            submitForm     = function (form) {
+        loadForm = function () {
+            return new Promise(function (resolve, reject) {
+                var url = self.attr('data-url');
+                if (self.attr('data-update') == 'true') {
+                    url += '&' + self.attr('data-pk') + '=' + $('#' + self.attr('data-select2')).val();
+                }
+                if (self.attr('data-depend')) {
+                    var dependField = $('#'+self.attr('data-depend'));
+                    var formName = self.attr('data-form-name');
+                    url += '&hide='+self.attr('data-depend-link')+'&'+formName+'['+self.attr('data-depend-link')+']='+$(dependField).val();
+                }
+                $.get(url)
+                    .done(function (data) {
+                        $('.loader').addClass('hide');
+                        resolve(data);
+                    });
+            })
+        },
+            submitForm = function (form) {
                 var select2 = '#' + self.attr('data-select2');
                 return new Promise(function (resolve, reject) {
                     $('.loader').removeClass('hide');
@@ -93,7 +103,7 @@ $.fn.hasAttr = function (name) {
                 }, function (data) {
                     $(self).find('.modal-body').html(data);
                 });
-                
+
                 return false;
             })
             .on('hide.bs.modal', function () {

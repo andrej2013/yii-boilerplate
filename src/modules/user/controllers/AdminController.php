@@ -107,27 +107,4 @@ class AdminController extends BaseController
         ]);
     }
 
-    public function actionTwData($id)
-    {
-        Url::remember('', 'actions-redirect');
-        $user = $this->findModel($id);
-        $userTwData = $user->userTwData;
-
-        if ($userTwData == null) {
-            if (!isset($this->module->modelMap['UserTwData'])) {
-                throw new InvalidConfigException(\Yii::t('app', 'UserTwData is not set in User module model map'));
-            }
-            $userTwData = \Yii::createObject($this->module->modelMap['UserTwData']);
-            $userTwData->link('user', $user);
-        }
-        if ($userTwData->load(\Yii::$app->request->post()) && $userTwData->save()) {
-            \Yii::$app->getSession()->setFlash('success', \Yii::t('user', 'User Tw Data details have been updated'));
-            return $this->refresh();
-        }
-
-        return $this->render('_tw_data', [
-            'user' => $user,
-            'model' => $userTwData,
-        ]);
-    }
 }

@@ -13,7 +13,6 @@
 /**
  * @property \andrej2013\yiiboilerplate\modules\share\models\FlysystemUser[] $flysystemUsers
  * @property \andrej2013\yiiboilerplate\modules\share\models\Flysystem[]     $flysystems
- * @property \andrej2013\yiiboilerplate\modules\user\models\UserTwData       $userTwData
  * @property \andrej2013\yiiboilerplate\modules\user\models\Profile          $profile
  */
 namespace andrej2013\yiiboilerplate\modules\user\models;
@@ -26,11 +25,6 @@ use Yii;
 
 class User extends \dektrium\user\models\User
 {
-    /**
-     * todo: determine if this is the best way to handle this. It is similar in dektrium, which seems ridiculous.
-     * @var UserTwData
-     */
-    private $_userTwData;
 
     /**
      * @var \app\models\User
@@ -43,7 +37,7 @@ class User extends \dektrium\user\models\User
      */
     public function toString()
     {
-        return !empty($this->profile->name) && !empty($this->profile->name) ? $this->profile->name : $this->username;
+        return !empty($this->profile->name) ? $this->profile->name : $this->username;
     }
 
     /**
@@ -107,24 +101,6 @@ class User extends \dektrium\user\models\User
     }
 
     /**
-     * @return array
-     */
-    public function extraFields()
-    {
-        return array_merge([
-            'userTwData',
-        ], parent::extraFields());
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getUserTwData()
-    {
-        return $this->hasOne($this->module->modelMap['UserTwData'], ['user_id' => 'id']);
-    }
-
-    /**
      * @param null $options
      * @return mixed|null
      * @throws \Exception
@@ -178,25 +154,6 @@ class User extends \dektrium\user\models\User
             $profile->user_id = $this->id;
             $profile->save(false);
         }
-
-        // Make sure the schema exists first. Need to do this for projects that create users before the migration
-        // creating the table exists.
-        $tableSchema = Yii::$app->db->schema->getTableSchema('{{%user_tw_data}}');
-        if ($tableSchema !== null) {
-            if ($this->userTwData == null) {
-                $this->_userTwData = Yii::createObject($this->module->modelMap['UserTwData']);
-                $this->_userTwData->link('user', $this);
-            }
-        }
-    }
-
-    /**
-     * Todo: is this really how this should be done?
-     * @param UserTwData $userTwData
-     */
-    public function setUserTwData(UserTwData $userTwData)
-    {
-        $this->_userTwData = $userTwData;
     }
 
     /**
@@ -204,9 +161,6 @@ class User extends \dektrium\user\models\User
      */
     public function beforeDelete()
     {
-        if ($this->userTwData) {
-            $this->userTwData->forceDelete();
-        }
         if ($this->profile) {
             $this->profile->delete();
         }

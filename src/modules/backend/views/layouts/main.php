@@ -30,7 +30,7 @@ if (Yii::$app->controller->action->id === 'login') {
         <title><?= Html::encode($this->title) ?></title>
         <?php $this->head() ?>
     </head>
-    <body class="hold-transition skin-blue sidebar-mini">
+    <body class="hold-transition skin-blue sidebar-mini <?= Yii::$app->params['adminSkin'] ?>">
     <?php $this->beginBody() ?>
     <div class="loader hide"></div>
 
