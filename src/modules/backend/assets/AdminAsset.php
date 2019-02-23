@@ -24,7 +24,7 @@ class AdminAsset extends AssetBundle
     public $sourcePath = '@andrej2013-boilerplate/modules/backend/assets/web';
 
     public $css = [
-        'less/admin.less',
+        'css/admin.css',
     ];
     public $js = [
         'js/crud.js',

@@ -16,7 +16,7 @@ class FlatAsset extends AssetBundle
     public $sourcePath = '@andrej2013-boilerplate/modules/backend/assets/web';
 
     public $css = [
-        'less/flat.less',
+        'css/flat.css',
     ];
     public $js = [
     ];

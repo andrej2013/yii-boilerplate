@@ -16,7 +16,7 @@ class RoundAsset extends AssetBundle
     public $sourcePath = '@andrej2013-boilerplate/modules/backend/assets/web';
 
     public $css = [
-        'less/round.less',
+        'css/round.css',
     ];
     public $js = [
     ];
