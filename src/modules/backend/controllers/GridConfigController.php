@@ -32,6 +32,6 @@ class GridConfigController extends Controller
             $grid_config->show = 1;
             $grid_config->save();
         }
-        \Yii::$app->response->redirect(Url::previous());
+        return true;
     }
 }
