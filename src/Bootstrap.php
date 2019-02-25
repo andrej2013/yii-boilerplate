@@ -626,10 +626,10 @@ class Bootstrap implements BootstrapInterface
      */
     private function registerModule($module, $options, $override = false)
     {
-        if ($override || ! $this->app->has($module)) {
+        if ($override || ! $this->app->hasModule($module)) {
             $this->app->setModules([$module => $options]);
         } else {
-            $this->app->setModules([$module => ArrayHelper::merge($options, $this->app->getModules(true)[$module])]);
+            $this->app->setModules([$module => ArrayHelper::merge($options, $this->app->getModules(false)[$module])]);
         }
     }
 
