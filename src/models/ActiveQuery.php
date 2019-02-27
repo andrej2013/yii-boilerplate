@@ -142,7 +142,7 @@ class ActiveQuery extends BaseActiveQuery
             return $value;
         };
 
-        $attributes = ['where', 'orderBy', 'on', 'having', 'union'];
+        $attributes = ['where', 'orderBy', 'on', 'having', 'union', 'groupBy'];
         foreach ($attributes as $attribute) {
             if (! empty($query->$attribute)) {
                 $query->$attribute = $replaceAliasRecursively($query->$attribute);
@@ -170,6 +170,13 @@ class ActiveQuery extends BaseActiveQuery
      */
     public function joinWith($with, $eagerLoading = true, $joinType = 'LEFT JOIN')
     {
+        $with = (array)$with;
+        foreach ($with as $name => $callback) {
+            if (is_int($name) && strpos($callback, ' ') === false) {
+                $callback = $callback . ' ' . $callback;
+            }
+            $with[$name] = $callback;
+        }
         $result = parent::joinWith($with, $eagerLoading, $joinType);
         foreach ($this->joinWith as $i => $config) {
             foreach ($config[0] as $j => $relation) {
