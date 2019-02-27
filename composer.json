@@ -57,7 +57,8 @@
     "bookin/yii2-awesome-bootstrap-checkbox": "@dev",
     "kartik-v/yii2-widget-typeahead": "dev-master",
     "kartik-v/yii2-widget-switchinput": "dev-master",
-    "fortawesome/font-awesome": "*"
+    "fortawesome/font-awesome": "*",
+    "yii2tech/ar-softdelete": "*"
   },
   "autoload": {
     "classmap": ["src/traits/ArrayableTrait.php", "src/helpers/ArrayHelper.php"],

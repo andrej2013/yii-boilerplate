@@ -14,6 +14,8 @@ use andrej2013\yiiboilerplate\behaviors\BlameableBehavior;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord as BaseActiveRecord;
 use yii\db\Expression;
+use yii2tech\ar\softdelete\SoftDeleteBehavior;
+use yii2tech\ar\softdelete\SoftDeleteQueryBehavior;
 
 /**
  * This is the andrej2013 base-model class for table "TwActiveRecord".
@@ -65,7 +67,14 @@ class ActiveRecord extends BaseActiveRecord
                 HistoryBehavior::EVENT_INSERT,
             ],
         ];
-        $behaviors['SoftDelete'] = SoftDelete::class;
+        $behaviors['SoftDelete'] = [
+                'class' => \yii2tech\ar\softdelete\SoftDeleteBehavior::class,
+                'softDeleteAttributeValues' => [
+                    'deleted_at' => new Expression('NOW()'),
+                ],
+                'replaceRegularDelete' => true,
+        ];
+        
         return $behaviors;
     }
 
@@ -106,14 +115,15 @@ class ActiveRecord extends BaseActiveRecord
      */
     public static function find($removedDeleted = true)
     {
-        $model = new \andrej2013\yiiboilerplate\models\ActiveQuery(get_called_class());
-        $reflection = new \ReflectionClass(get_called_class());
-        if ($reflection->hasMethod('tableAlias')) {
-            $model->andWhere([static::tableAlias() . '.deleted_at' => null]);
-        } else {
-            $model->andWhere([static::tableName() . '.deleted_at' => null]);
-        }
-        return $model;
+        
+        $query = new \app\db\ActiveQuery(get_called_class());
+        $query->attachBehavior('softDelete', [
+            'class' => \andrej2013\yiiboilerplate\behaviors\SoftDeleteQueryBehavior::class,
+            'notDeletedCondition' => [
+                'deleted_at' => null,
+            ],
+        ]);
+        return $query->filterDeleted(null);
     }
 
     /**
@@ -191,4 +201,5 @@ class ActiveRecord extends BaseActiveRecord
     {
         return [];
     }
+    
 }
