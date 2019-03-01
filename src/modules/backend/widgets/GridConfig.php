@@ -88,14 +88,17 @@ class GridConfig extends Widget
             'grid_id' => $this->grid,
         ]);
         $columns = $gridConfig->parseColumns();
-        echo Html::hiddenInput('grid', $this->grid);
-        foreach ($columns as $column) {
-            $gridConfig = \andrej2013\yiiboilerplate\modules\backend\models\GridConfig::findOne([
+        $attributes = $gridConfig->getFindAttributes();
+            $gridConfig = \andrej2013\yiiboilerplate\modules\backend\models\GridConfig::find()->andWhere([
                 'user_id' => Yii::$app->user->id,
                 'grid'    => $this->grid,
-                'column'  => $column['attribute'],
-            ]);
-            $value = $gridConfig && $gridConfig->show === 0 ? 0 : 1;
+                'column'  => $attributes,
+            ])->asArray()->indexBy('column')->all();
+        
+        echo Html::hiddenInput('grid', $this->grid);
+        foreach ($columns as $column) {
+            $config = $gridConfig[$column['attribute']];
+            $value = $config && (int)$config['show'] === 0 ? 0 : 1;
             echo Html::beginTag('div', ['class' => 'col-sm-6']);
             echo Html::beginTag('div', ['class' => 'form-group']);
             echo Html::label($column['label'], "grid_config_" . $column['attribute'], ['class' => 'control-label']);

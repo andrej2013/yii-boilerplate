@@ -29,7 +29,7 @@ class SoftDeleteQueryBehavior extends BaseBehavior
     protected function normalizeFilterCondition($condition)
     {
         if (method_exists($this->owner, 'getTablesUsedInFrom')) {
-            $alias = \app\db\ActiveQuery::ALIAS_PLACEHOLDER;
+            $alias = \yii\db\ActiveQuery::ALIAS_PLACEHOLDER;
             foreach ($condition as $attribute => $value) {
                 if (is_numeric($attribute) || strpos($attribute, '.') !== false) {
                     continue;

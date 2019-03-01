@@ -168,7 +168,7 @@ class FilterWidget extends Widget
                                                                  ->all(), $foreignAttribute, 'toString'),
                         'initValueText'   => $foreignModelClass::find()
                                                                ->count() > 50 ? ArrayHelper::map($foreignModelClass::find()
-                                                                                                                   ->andWhere([$foreignAttribute => $this->model->$attribute])
+                                                                                                                   ->andWhere(['@alias.'.$foreignAttribute => $this->model->$attribute])
                                                                                                                    ->all(), $foreignAttribute, 'toString') : '',
                         'id'              => "{$this->shortModelName}_$attribute",
                         'name'            => "{$this->shortModelName}[$attribute]",

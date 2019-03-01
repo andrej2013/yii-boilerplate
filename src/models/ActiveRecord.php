@@ -115,8 +115,7 @@ class ActiveRecord extends BaseActiveRecord
      */
     public static function find($removedDeleted = true)
     {
-        
-        $query = new \app\db\ActiveQuery(get_called_class());
+       $query = new \yii\db\ActiveQuery(get_called_class());
         $query->attachBehavior('softDelete', [
             'class' => \andrej2013\yiiboilerplate\behaviors\SoftDeleteQueryBehavior::class,
             'notDeletedCondition' => [

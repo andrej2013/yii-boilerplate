@@ -31,6 +31,8 @@ class User extends \dektrium\user\models\User
      */
     private static $_instance;
     
+    private static $role;
+    
     /**
      * User's toString method. Can be overridden.
      * @return mixed
@@ -186,7 +188,10 @@ class User extends \dektrium\user\models\User
      */
     public function isRole($role)
     {
-        return \Yii::$app->authManager->getAssignment($role, \Yii::$app->user->id) !== null;
+        if (self::$role === null) {
+            self::$role = array_keys(\Yii::$app->authManager->getRolesByUser($this->id));
+        }
+        return in_array($role, self::$role);
     }
 
 }

@@ -41,6 +41,8 @@ class GridConfig extends BaseGridConfig
             }
         }
         $sliced = [];
+        $attributes = $this->getFindAttributes();
+        $gridConfig = self::find()->andWhere(['user_id' => Yii::$app->user->id, 'grid' => $this->grid_id, 'column' => $attributes])->indexBy('column')->asArray()->all();
         foreach ($this->columns as $i => $column) {
             if (isset($column['visible']) && $column['visible'] == false) {
                 continue;
@@ -50,16 +52,16 @@ class GridConfig extends BaseGridConfig
                 $sliced[] = $column;
                 continue;
             }
-            $gridConfig = self::findOne(['user_id' => Yii::$app->user->id, 'grid' => $this->grid_id, 'column' => $attribute]);
-            if ($gridConfig && $gridConfig->show === 0) {
+            
+            if ($gridConfig[$attribute] && (int)$gridConfig[$attribute]['show'] === 0) {
                 continue;
-            } else if (!$gridConfig) {
-                $gridConfig = new self();
-                $gridConfig->user_id = Yii::$app->user->id;
-                $gridConfig->grid = $this->grid_id;
-                $gridConfig->column = $attribute;
-                $gridConfig->show = 1;
-                $gridConfig->save();
+            } else if (!($gridConfig[$attribute])) {
+                $gridConfigColumn = new self();
+                $gridConfigColumn->user_id = Yii::$app->user->id;
+                $gridConfigColumn->grid = $this->grid_id;
+                $gridConfigColumn->column = $attribute;
+                $gridConfigColumn->show = 1;
+                $gridConfigColumn->save();
             }
             $sliced[] = $column;
         }
@@ -68,7 +70,23 @@ class GridConfig extends BaseGridConfig
         }
         return $sliced;
     }
-
+    
+    public function getFindAttributes()
+    {
+        $attributes = [];
+        foreach ($this->columns as $i => $column) {
+            if (isset($column['visible']) && $column['visible'] == false) {
+                continue;
+            }
+            $attribute = $this->findAttribute($column);
+            if ($attribute == false) {
+                continue;
+            }
+            $attributes[] = $attribute;
+        }
+        return $attributes;
+    }
+    
     /**
      * @return array
      */
