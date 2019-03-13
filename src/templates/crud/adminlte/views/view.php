@@ -276,7 +276,7 @@ EOS;
                     ],
 EOS;
         $model = new $generator->modelClass;
-        if (in_array('fileBehavior', array_keys($model->behaviors()))) {
+        if ($model->getBehavior('fileBehavior')) {
             $items[] = <<<EOS
                     [
                         'content' => \\andrej2013\\yiiboilerplate\\widget\\Attachment::widget([

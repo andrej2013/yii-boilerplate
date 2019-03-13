@@ -48,7 +48,7 @@ class DateProvider extends Provider
                             'type'           => '\\kartik\\datetime\\DateTimePicker::TYPE_COMPONENT_APPEND',
                             'ajaxConversion' => true,
                             'pickerButton'   => [
-                                'icon' => 'time',
+                                'icon' => "'time'",
                             ],
                         ],
                     ]);
@@ -120,10 +120,10 @@ HTML;
                         }'",
                     ],
                     'pluginOptions'  => [
-                        'opens'  => 'left',
+                        'opens'  => "'left'",
                         'locale' => [
                             'format'    => $format,
-                            'separator' => ' TO ',
+                            'separator' => "' TO '",
                         ],
                     ],
                 ],

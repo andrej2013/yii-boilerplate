@@ -106,7 +106,7 @@ $caller_id = $is_popup ? ('_from_' . $caller_id) : '';
 <?php
             }
         $model = new $generator->modelClass;
-        if (in_array('fileBehavior', array_keys($model->behaviors()))) {
+        if ($model->getBehavior('fileBehavior') !== null) {
             $lines[] = "<?= \$form->field(\$model, 'attachments')
         ->widget(\\andrej2013\\yiiboilerplate\\widget\\Attachment::class, [
                             'model' => \$model,

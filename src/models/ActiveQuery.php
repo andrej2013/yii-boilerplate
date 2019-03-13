@@ -77,6 +77,15 @@ class ActiveQuery extends Query implements ActiveQueryInterface
     }
 
     /**
+     * @return array
+     */
+    public function getAllIds()
+    {
+        $class = $this->modelClass;
+        $pks = $class::primaryKey();
+        return $this->select($pks)->column();
+    }
+    /**
      * {@inheritdoc}
      */
     public function prepare($builder)
