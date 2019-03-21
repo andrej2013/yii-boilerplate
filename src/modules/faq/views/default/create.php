@@ -4,35 +4,33 @@ use yii\helpers\Html;
 
 /**
  * @var yii\web\View $this
- * @var app\modules\faq\models\Faq $model
+ * @var app\models\Faq $model
  */
 
 $this->title = Yii::t('app', 'Create');
-$this->params['breadcrumbs'][] = ['label' => 'Faqs', 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Frequently Asked Questions Manage'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="box box-default">
+<div class="box box-<?php echo \Yii::$app->params['style']['primary_color']; ?>">
     <div
         class="giiant-crud box-body faq-create">
-
-        <h1>
-            <?= Yii::t('app', 'Faq') ?>
-            <small>
-                <?= $model->title ?>
-            </small>
-        </h1>
 
         <div class="clearfix crud-navigation">
             <div class="pull-left">
                 <?= Html::a(
-                    Yii::t('app', 'Cancel'),
+                    '<span class="fa fa-ban"></span> '.Yii::t('app', 'Cancel'),
                     \yii\helpers\Url::previous(),
-                    ['class' => 'btn btn-default']) ?>
+                    [
+                        'class' => 'btn',
+                        'preset' => Html::PRESET_DANGER,
+                    ]
+                ) ?>
             </div>
         </div>
 
         <?= $this->render('_form', [
             'model' => $model,
+            'hide'  => $hide,
         ]); ?>
 
     </div>

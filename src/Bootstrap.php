@@ -346,6 +346,11 @@ class Bootstrap implements BootstrapInterface
                         'component' => 'fs',
                         'name'      => 'Storage',
                     ],
+                    [
+                        'class'     => \andrej2013\yiiboilerplate\components\elfinder\flysystem\Volume::class,
+                        'component' => 'fs-faq',
+                        'name'      => 'Faq',
+                    ],
                 ],
             ],
             // used for frontend
@@ -428,6 +433,11 @@ class Bootstrap implements BootstrapInterface
         $this->registerComponent('fs', [
             'class' => \creocoder\flysystem\LocalFilesystem::class,
             'path'  => '@app/../storage',
+        ]);
+
+        $this->registerComponent('fs-faq', [
+            'class' => \creocoder\flysystem\LocalFilesystem::class,
+            'path'  => '@app/../storage/faq',
         ]);
 
         $disabledFs = ! empty($app->params['disabled_fs']) && in_array('assetsprod', $app->params['disabled_fs']);

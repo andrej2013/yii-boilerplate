@@ -3,7 +3,7 @@
 use yii\helpers\Url;
 use yii\helpers\Html;
 
-$this->title = Yii::t('app', 'Faq');
+$this->title = Yii::t('app', 'Frequently Asked Questions');
 $this->params['breadcrumbs'][] = $this->title;
 
 $formatter = \Yii::$app->formatter;

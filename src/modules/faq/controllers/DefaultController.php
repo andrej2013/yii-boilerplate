@@ -6,6 +6,8 @@
 
 namespace andrej2013\yiiboilerplate\modules\faq\controllers;
 
+use andrej2013\yiiboilerplate\modules\faq\models\Faq;
+
 /**
  * DefaultController implements the CRUD actions for Faq model.
  */
@@ -14,6 +16,8 @@ class DefaultController extends \andrej2013\yiiboilerplate\modules\faq\controlle
     public function init()
     {
         parent::init();
-        $this->layout = '@andrej2013-backend-views/layouts/main.php';
+        $this->model = Faq::class;
+        $this->searchModel = \andrej2013\yiiboilerplate\modules\faq\models\search\Faq::class;
     }
+    
 }
