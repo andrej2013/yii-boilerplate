@@ -208,6 +208,20 @@ trait SearchTrait
                     $conditions['attribute'],
                 ]);
                 break;
+            case 'IN':
+                $query->andFilterWhere([
+                    $conditions['operator'],
+                    $field_name,
+                    $conditions['attribute'],
+                ]);
+                break;
+            default:
+                $query->andFilterWhere([
+                    $conditions['operator'],
+                    $field_name,
+                    $conditions['attribute'],
+                ]);
+                break;
         }
     }
 
