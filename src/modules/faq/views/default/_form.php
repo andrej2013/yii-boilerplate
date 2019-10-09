@@ -59,6 +59,8 @@ $caller_id = $is_popup ? ('_from_' . $caller_id) : '';
                         'editorOptions' => \mihaildev\elfinder\ElFinder::ckeditorOptions('elfinder-backend', [
                             'height' => 300,
                             'preset' => 'standard',
+                            'removeButtons' => '',
+                            'removePlugins' => 'elementspath',
                         ]),
                     ])
                     ->hint($model->getAttributeHint('content'))
