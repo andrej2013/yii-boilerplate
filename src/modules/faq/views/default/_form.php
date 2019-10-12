@@ -50,6 +50,10 @@ $caller_id = $is_popup ? ('_from_' . $caller_id) : '';
              'maxlenght'   => 255,
          ])
          ->hint($model->getAttributeHint('title')); ?>
+    <?php
+    list(, $assetPath) = Yii::$app->assetManager->publish('@vendor/andrej2013/yii-boilerplate/src/modules/backend/assets/web/ckeditor/plugins/youtube');
+    $this->registerJs("CKEDITOR.plugins.addExternal('youtube', '$assetPath/plugin.js', '');");
+    ?>
     <?php echo $form->field($model, 'content', [
         'selectors' => [
             'input' => '#' . Html::getInputId($model, 'content') . $caller_id,
@@ -57,10 +61,11 @@ $caller_id = $is_popup ? ('_from_' . $caller_id) : '';
     ])
                     ->widget(\andrej2013\yiiboilerplate\widget\CKEditor::classname(), [
                         'editorOptions' => \mihaildev\elfinder\ElFinder::ckeditorOptions('elfinder-backend', [
-                            'height' => 300,
-                            'preset' => 'standard',
+                            'height'        => 300,
+                            'preset'        => 'standard',
                             'removeButtons' => '',
                             'removePlugins' => 'elementspath',
+                            'extraPlugins'  => 'youtube',
                         ]),
                     ])
                     ->hint($model->getAttributeHint('content'))
