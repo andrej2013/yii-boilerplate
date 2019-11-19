@@ -64,7 +64,7 @@ a.desc:after {
 }
 
 
-// Make required fields visible and put * mark
+/*Make required fields visible and put * mark*/
 form div.required label.control-label:after {
   content: "\00a0\00a0*"; /* \00a0 is non breaking space */
   color: #FF0000;
@@ -139,7 +139,7 @@ form div.required label.control-label:after {
 .modal-content {
   border-radius: 6px;
 }
-// Dateranger picker when window is too small
+/*Dateranger picker when window is too small*/
 .form-control .kv-drp-dropdown {
   overflow: hidden;
 }
