@@ -49,7 +49,7 @@ function buildLevel($data, $id, $selectedFaqId)
                      class="panel-collapse collapse <?= $selectedFaqId == $nestedModel->id ? 'in' : ''; ?>">
                     <!-- Content -->
                     <div class="panel-body">
-                        <p><?= $nestedModel->content ?></p>
+                        <p><?= str_replace('<iframe', '<iframe allowfullscreen="true"', $nestedModel->content) ?></p>
                         <?= buildLevel($data, $nestedModel->id, $selectedFaqId); ?>
                     </div>
                 </div>
@@ -75,7 +75,7 @@ function buildLevel($data, $id, $selectedFaqId)
                      class="panel-collapse collapse <?= $faq_id == $model->id ? 'in' : ''; ?>">
                     <!-- Content -->
                     <div class="panel-body">
-                        <p><?= $model->content ?></p>
+                        <p><?= str_replace('<iframe', '<iframe allowfullscreen="true"', $model->content) ?></p>
                         <?= buildLevel($faqs, $model->id, $faq_id); ?>
                     </div>
                 </div>
