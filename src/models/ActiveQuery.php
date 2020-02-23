@@ -83,7 +83,11 @@ class ActiveQuery extends Query implements ActiveQueryInterface
     {
         $class = $this->modelClass;
         $pks = $class::primaryKey();
-        return $this->select($pks)->column();
+        $primary_keys = [];
+        foreach ($pks as $pk) {
+            $primary_keys[] = $this->getPrimaryTableName().'.'.$pk;
+        }
+        return $this->select($primary_keys)->column();
     }
     /**
      * {@inheritdoc}
