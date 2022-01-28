@@ -68,29 +68,6 @@ class Bootstrap implements BootstrapInterface
     {
 
         $this->setupCommonComponents($app);
-        $app->get('i18n')->translations = ArrayHelper::merge($app->get('i18n')->translations, [
-            '*'   => [
-                'class'              => 'andrej2013\yiiboilerplate\components\DbMessageSource',
-                'db'                 => 'db',
-                'sourceLanguage'     => 'en',
-                'sourceMessageTable' => '{{%language_source}}',
-                'messageTable'       => '{{%language_translate}}',
-                'cachingDuration'    => 86400,
-                'enableCaching'      => YII_DEBUG ? false : true,
-                'forceTranslation'   => getenv('APP_FORCE_TRANSLATION'),
-            ],
-            'app' => [
-                'class'              => 'andrej2013\yiiboilerplate\components\DbMessageSource',
-                'db'                 => 'db',
-                'sourceLanguage'     => 'en',
-                'sourceMessageTable' => '{{%language_source}}',
-                'messageTable'       => '{{%language_translate}}',
-                'cachingDuration'    => 86400,
-                'enableCaching'      => YII_DEBUG ? false : true,
-                'forceTranslation'   => getenv('APP_FORCE_TRANSLATION'),
-
-            ],
-        ]);
 
         $this->setupCommonModules($app);
 
@@ -414,17 +391,7 @@ class Bootstrap implements BootstrapInterface
         $this->registerComponent('fs_cache', [
             'class' => \yii\caching\FileCache::class,
         ]);
-
-        $this->registerComponent('db', [
-            'class'             => \yii\db\Connection::class,
-            'dsn'               => getenv('DATABASE_DSN'),
-            'username'          => getenv('DATABASE_USER'),
-            'password'          => getenv('DATABASE_PASSWORD'),
-            'charset'           => 'utf8',
-            'tablePrefix'       => getenv('DATABASE_TABLE_PREFIX'),
-            'enableSchemaCache' => YII_ENV_PROD ? true : false,
-        ]);
-
+        
         // Note: enable db sessions, if multiple containers are running
         /*$this->registerComponent('session', [
             'class' => \yii\web\DbSession::class
@@ -462,40 +429,6 @@ class Bootstrap implements BootstrapInterface
             'class' => \kartik\grid\Module::className(),
         ]);
 
-        $this->registerModule('translatemanager', [
-            'class'               => \lajax\translatemanager\Module::class,
-            'root'                => '@app/views',
-            // The root directory of the project scan.
-            //'scanRootParentDirectory' => true, // Whether scan the defined `root` parent directory, or the folder itself.
-            // IMPORTANT: for detailed instructions read the chapter about root configuration.
-            'layout'              => 'language',
-            // Name of the used layout. If using own layout use 'null'.
-            'allowedIPs'          => ['*'],
-            // IP addresses from which the translation interface is accessible.
-            'roles'               => ['@'],
-            // For setting access levels to the translating interface.
-            'tmpDir'              => '@runtime',
-            // Writable directory for the client-side temporary language files.
-            // IMPORTANT: must be identical for all applications (the AssetsManager serves the JavaScript files containing language elements from this directory).
-            'phpTranslators'      => ['::t'],
-            // list of the php function for translating messages.
-            'jsTranslators'       => ['lajax.t'],
-            // list of the js function for translating messages.
-            'patterns'            => ['*.js', '*.php'],
-            // list of file extensions that contain language elements.
-            'ignoredCategories'   => ['yii', 'language'],
-            // these categories won't be included in the language database.
-            'ignoredItems'        => ['config'],
-            // these files will not be processed.
-            'scanTimeLimit'       => null,
-            // increase to prevent "Maximum execution time" errors, if null the default max_execution_time will be used
-            'searchEmptyCommand'  => '!',
-            // the search string to enter in the 'Translation' search field to find not yet translated items, set to null to disable this feature
-            'defaultExportStatus' => 1,
-            // the default selection of languages to export, set to 0 to select all languages by default
-            'defaultExportFormat' => 'json',
-            // the default format for export, can be 'json' or 'xml'
-        ]);
         $this->registerModule('arhistory', [
             'class' => \bupy7\activerecord\history\Module::className(),
         ]);
