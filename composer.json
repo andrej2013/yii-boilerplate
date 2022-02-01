@@ -44,11 +44,8 @@
     "mihaildev/yii2-ckeditor": "*",
     "zabachok/yii2-file-log-reader": "*",
     "mpdf/mpdf": "*",
-    "guzzlehttp/guzzle": "6.*",
     "endroid/qrcode": "*",
     "quexer69/yii2-google-api": "2.0.*",
-    "google/apiclient": "^2.0",
-    "google/apiclient-services": "dev-master",
     "lajax/yii2-translate-manager": "1.*",
     "dmstr/yii2-adminlte-asset": "^2.6",
     "mihaildev/yii2-elfinder": "*",
@@ -56,7 +53,6 @@
     "bookin/yii2-awesome-bootstrap-checkbox": "@dev",
     "kartik-v/yii2-widget-typeahead": "dev-master",
     "kartik-v/yii2-widget-switchinput": "dev-master",
-    "fortawesome/font-awesome": "*",
     "yii2tech/ar-softdelete": "*"
   },
   "autoload": {
