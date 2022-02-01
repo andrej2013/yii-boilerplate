@@ -9,7 +9,7 @@
   "license": "BSD-3-Clause",
   "minimum-stability": "stable",
   "require": {
-    "yiisoft/yii2": "~2.0.14",
+    "yiisoft/yii2": "~2.0.14"
   },
   "autoload": {
     "classmap": ["src/traits/ArrayableTrait.php", "src/helpers/ArrayHelper.php"],
