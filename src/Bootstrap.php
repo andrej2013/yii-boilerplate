@@ -482,30 +482,6 @@ class Bootstrap implements BootstrapInterface
             'as access' => $app->getBehavior('access'),
         ]);
 
-        $this->registerModule('adminer', [
-            'class' => \andrej2013\yiiboilerplate\modules\adminer\Module::class,
-        ]);
-
-        $this->registerModule('webshell', [
-            'class'               => \samdark\webshell\Module::className(),
-            'allowedIPs'          => ['*', '127.0.0.1', '192.168.50.1', '178.220.62.51'],
-            'checkAccessCallback' => function (\yii\base\Action $action) {
-                return Yii::$app->user->can('Authority');
-            },
-            'controllerNamespace' => '\andrej2013\yiiboilerplate\modules\webshell\controllers',
-            'defaultRoute'        => 'index',
-            'viewPath'            => '@andrej2013-boilerplate/modules/webshell/view',
-            'yiiScript'           => Yii::getAlias('@root') . '/yii',
-        ]);
-        $this->registerModule('deploy', [
-            'class'          => \app\modules\deploy\DeployModule::class,
-            'token'          => getenv('DEPLOY_SECRET_KEY') ?? '0e05da967238924eb92fd8b71bb7a199',
-            'enableComposer' => true,
-            'gitBin'         => getenv('GIT_PATH') ?? '/usr/bin/git',
-            'phpBin'         => getenv('PHP_PATH') ?? '/usr/bin/php',
-            'composerBin'    => getenv('COMPOSER_PATH') ?? '/usr/bin/composer',
-            'branch'         => getenv('GIT_BRANCH') ?? 'master',
-        ]);
     }
 
     /**
