@@ -77,8 +77,8 @@ class Migration extends BaseMigration
             $this->db->createCommand()->addColumn($table, "updated_at", Schema::TYPE_DATETIME)->execute();
             $this->db->createCommand()->addColumn($table, "deleted_by", Schema::TYPE_INTEGER)->execute();
             $this->db->createCommand()->addColumn($table, "deleted_at", Schema::TYPE_DATETIME)->execute();
+            $this->createIndex('deleted_at_idx', $table, "deleted_at");
         }
-        $this->createIndex('deleted_at_idx', $table, "deleted_at");
 
         echo " done (time: " . sprintf('%.3f', microtime(true) - $time) . "s)\n";
     }
