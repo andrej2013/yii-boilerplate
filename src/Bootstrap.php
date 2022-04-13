@@ -83,7 +83,6 @@ class Bootstrap implements BootstrapInterface
     protected function setupWeb($app)
     {
         $app->get('request')->cookieValidationKey = getenv('APP_COOKIE_VALIDATION_KEY');
-        $app->get('user')->identityClass = User::class;
         $this->setupWebComponents($app);
         $this->setupWebModules($app);
         $this->setupElfinder($app);
