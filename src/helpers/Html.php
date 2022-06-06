@@ -25,7 +25,9 @@ class Html extends BaseHtml
 
     public static function tag($name, $content = '', $options = [])
     {
-         
+        $options += [
+            'class' => '',
+        ]; 
         if ($name === 'button' || (
                 $name === 'a' && (
                     (is_array($options['class']) && in_array('btn', $options['class'])) || 
